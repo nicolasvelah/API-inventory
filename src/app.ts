@@ -2,12 +2,17 @@ import express, { Application } from 'express';
 import apiV1 from './api/routes/v1';
 import Completer from './helpers/completer';
 import injectDependencies from './dependency-injection';
+import MongoDb from './data/db';
 
 export default class App {
   private app: Application = express();
 
-  initialize = (): Promise<void> => {
+  initialize = async (): Promise<void> => {
     const completer = new Completer<void>();
+
+    const uriMongoDB = process.env.MONGO_URI ?? '';
+    const connected = await MongoDb.connect(uriMongoDB);
+    if (!connected) return;
 
     injectDependencies();
 
@@ -18,6 +23,6 @@ export default class App {
       console.log('Server listening on port', PORT);
       completer.complete();
     });
-    return completer.promise;
+    //return completer.promise;
   };
 }
