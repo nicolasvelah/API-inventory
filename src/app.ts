@@ -7,8 +7,12 @@ export default class App {
 
   initialize = (): Promise<void> => {
     const completer = new Completer<void>();
+
     apiV1(this.app);
-    this.app.listen(5000, () => {
+
+    const PORT = process.env.PORT ?? 5000;
+    this.app.listen(PORT, () => {
+      console.log('Listen server on port', PORT);
       completer.complete();
     });
     return completer.promise;
