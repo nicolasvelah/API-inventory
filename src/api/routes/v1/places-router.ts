@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import UsersController from '../../controllers/v1/users-controller';
+import PlacesController from '../../controllers/v1/places-controller';
 
 export default () => {
   const router = Router();
-  const controller = new UsersController();
+  const controller = new PlacesController();
   router.post('/create', controller.create);
   return router;
 };
