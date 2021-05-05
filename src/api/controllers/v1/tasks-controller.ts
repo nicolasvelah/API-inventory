@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
-import UsersRepository from '../../../domain/repositories/users-repository';
+import TasksRepository from '../../../domain/repositories/tasks-repository';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
-export default class UsersController {
-  private usersRepo = Get.find<UsersRepository>(Dependencies.users);
+export default class TasksController {
+  private tasksRepo = Get.find<TasksRepository>(Dependencies.tasks);
 
   constructor() {
     autoBind(this);
@@ -14,17 +14,17 @@ export default class UsersController {
 
   async create(req: Request, res: Response) {
     try {
-      const user = await this.usersRepo.create({
-        name: '',
-        dateOfBirth: new Date(),
-        lastName: '',
-        phone: '',
-        email: '',
-        password: '',
-        role: 'technical',
-        enabled: true
+      const task = await this.tasksRepo.create({
+        arrivalDate: new Date(),
+        arrivalLatLong: [0, 0],
+        arrivalPhoto: '',
+        closeDate: new Date(),
+        closeLatLong: [0, 0],
+        closePhoto: '',
+        scheduledDate: new Date(),
+        type: 'maintenance'
       });
-      res.send(user);
+      res.send(task);
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -32,7 +32,7 @@ export default class UsersController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const deleted = await this.usersRepo.deleteById('ssaskasjasj');
+      const deleted = await this.tasksRepo.deleteById('ssaskasjasj');
       res.send(deleted);
     } catch (e) {
       sendErrorResponse(e, res);

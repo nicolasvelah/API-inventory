@@ -15,7 +15,7 @@ export default class App {
 
     const PORT = process.env.PORT ?? 5000;
     this.app.listen(PORT, () => {
-      console.log('Listen server on port', PORT);
+      console.log('Server listening on port', PORT);
       completer.complete();
     });
     return completer.promise;
