@@ -1,4 +1,6 @@
 import express, { Application } from 'express';
+import cors from 'cors';
+import { json, urlencoded } from 'body-parser';
 import apiV1 from './api/routes/v1';
 import Completer from './helpers/completer';
 import injectDependencies from './dependency-injection';
@@ -6,6 +8,16 @@ import MongoDb from './data/db';
 
 export default class App {
   private app: Application = express();
+
+  /**
+   * enable the api cors, body parser
+   * this method must be called after create proxies
+   */
+  private enableCors = () => {
+    this.app.use(cors()); // enable cors
+    this.app.use(json()); // convert the incomming request to json
+    this.app.use(urlencoded({ extended: false })); // urlencoded to false
+  };
 
   initialize = async (): Promise<void> => {
     const completer = new Completer<void>();
@@ -15,6 +27,7 @@ export default class App {
     if (!connected) return;
 
     injectDependencies();
+    this.enableCors();
 
     apiV1(this.app);
 

@@ -14,15 +14,30 @@ export default class TasksController {
 
   async create(req: Request, res: Response) {
     try {
+      const {
+        user,
+        place,
+        arrivalDate,
+        arrivalLatLong,
+        arrivalPhoto,
+        closeDate,
+        closeLatLong,
+        closePhoto,
+        scheduledDate,
+        type
+      } = req.body;
+
       const task = await this.tasksRepo.create({
-        arrivalDate: new Date(),
-        arrivalLatLong: [0, 0],
-        arrivalPhoto: '',
-        closeDate: new Date(),
-        closeLatLong: [0, 0],
-        closePhoto: '',
-        scheduledDate: new Date(),
-        type: 'maintenance'
+        user,
+        place,
+        arrivalDate: new Date(arrivalDate),
+        arrivalLatLong,
+        arrivalPhoto,
+        closeDate: new Date(closeDate),
+        closeLatLong,
+        closePhoto,
+        scheduledDate: new Date(scheduledDate),
+        type
       });
       res.send(task);
     } catch (e) {
@@ -32,8 +47,18 @@ export default class TasksController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const deleted = await this.tasksRepo.deleteById('ssaskasjasj');
+      const { id } = req.body;
+      const deleted = await this.tasksRepo.deleteById(id);
       res.send(deleted);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const tasks = await this.tasksRepo.getAll();
+      res.send(tasks);
     } catch (e) {
       sendErrorResponse(e, res);
     }

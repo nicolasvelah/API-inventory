@@ -2,6 +2,8 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
+import User from './user';
+import Place from './place';
 
 enum TaskType {
   installation,
@@ -12,8 +14,8 @@ export type taskType = keyof typeof TaskType;
 export const TASK_TYPE_LIST = Object.keys(TaskType);
 
 export default interface Task extends Document {
-  idUser: string;
-  idPlace: string;
+  user: User;
+  place: Place;
   scheduledDate: Date;
   arrivalDate: Date;
   arrivalLatLong: [number, number];

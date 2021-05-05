@@ -14,16 +14,30 @@ export default class PlacesController {
 
   async create(req: Request, res: Response) {
     try {
+      const {
+        name,
+        addressNumber,
+        city,
+        colony,
+        latLong,
+        mainStreet,
+        municipality,
+        state,
+        type
+      } = req.body;
+
+      console.log('req.body -->', req.body);
+
       const place = await this.placesRepo.create({
-        name: 'CC RECREO',
-        addressNumber: 'S55-18',
-        city: 'Quito',
-        colony: 'Recreo',
-        latLong: [1, 2],
-        mainStreet: '',
-        municipality: '',
-        state: '',
-        type: 'AMT'
+        name,
+        addressNumber,
+        city,
+        colony,
+        latLong,
+        mainStreet,
+        municipality,
+        state,
+        type
       });
 
       res.send(place);
@@ -36,6 +50,15 @@ export default class PlacesController {
     try {
       const deleted = await this.placesRepo.deleteById('ssaskasjasj');
       res.send(deleted);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const places = await this.placesRepo.getAll();
+      res.send(places);
     } catch (e) {
       sendErrorResponse(e, res);
     }

@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import PlacesController from '../../controllers/v1/places-controller';
+import TasksController from '../../controllers/v1/tasks-controller';
 
 export default () => {
   const router = Router();
-  const controller = new PlacesController();
+  const controller = new TasksController();
   router.post('/create', controller.create);
+  router.delete('/:id', controller.delete);
   router.get('', controller.getAll);
   return router;
 };

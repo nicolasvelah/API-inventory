@@ -12,4 +12,9 @@ export default class PlacesRepositoryImpl implements PlacesRepository {
     const result = await Places.deleteOne({ _id: id });
     return (result.deletedCount ?? 0) > 0;
   }
+
+  async getAll(): Promise<Place[]> {
+    const places = await Places.find({});
+    return places;
+  }
 }

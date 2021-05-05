@@ -4,6 +4,11 @@ import UsersRepository from '../../domain/repositories/users-repository';
 import Users from '../db/schemas/users';
 
 export default class UsersRepositoryImpl implements UsersRepository {
+  async getAll(): Promise<User[]> {
+    const users = await Users.find({});
+    return users;
+  }
+
   create(data: DocumentDefinition<User>): Promise<User> {
     return Users.create(data);
   }

@@ -1,7 +1,7 @@
 import { connect } from 'mongoose';
 
 export default class MongoDb {
-  static async connect(uri: string) {
+  static async connect(uri: string): Promise<boolean> {
     try {
       if (uri === '') throw new Error('The URL does not exist');
 

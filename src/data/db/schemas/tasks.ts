@@ -9,35 +9,21 @@ const schema = new Schema(
       ref: 'user',
       type: Schema.Types.ObjectId
     },
-    task: {
-      ref: 'task',
+    place: {
+      ref: 'place',
       type: Schema.Types.ObjectId
     },
     scheduledDate: { type: Date, required: true },
     arrivalDate: { type: Date, required: true },
     arrivalLatLong: {
-      type: {
-        type: String, // Don't do `{ location: { type: String } }`
-        enum: ['Point'], // 'location.type' must be 'Point'
-        required: true
-      },
-      coordinates: {
-        type: [Number],
-        required: true
-      }
+      type: [Number],
+      required: true
     },
     arrivalPhoto: { type: String, required: true },
     closeDate: { type: Date, required: true },
     closeLatLong: {
-      type: {
-        type: String, // Don't do `{ location: { type: String } }`
-        enum: ['Point'], // 'location.type' must be 'Point'
-        required: true
-      },
-      coordinates: {
-        type: [Number],
-        required: true
-      }
+      type: [Number],
+      required: true
     },
     closePhoto: { type: String, required: true },
     type: {

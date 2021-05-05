@@ -14,14 +14,16 @@ export default class UsersController {
 
   async create(req: Request, res: Response) {
     try {
+      const { name, dateOfBirth, lastName, phone, email, password, role } = req.body;
+
       const user = await this.usersRepo.create({
-        name: '',
-        dateOfBirth: new Date(),
-        lastName: '',
-        phone: '',
-        email: '',
-        password: '',
-        role: 'technical',
+        name,
+        dateOfBirth: new Date(dateOfBirth),
+        lastName,
+        phone,
+        email,
+        password,
+        role,
         enabled: true
       });
       res.send(user);
@@ -34,6 +36,16 @@ export default class UsersController {
     try {
       const deleted = await this.usersRepo.deleteById('ssaskasjasj');
       res.send(deleted);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const users = await this.usersRepo.getAll();
+      console.log('users -->', users);
+      res.send(users);
     } catch (e) {
       sendErrorResponse(e, res);
     }
