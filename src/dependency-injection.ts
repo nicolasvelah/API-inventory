@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
 import UsersRepositoryImpl from './data/repositories-implementation/users-repository-impl';
 import UsersRepository from './domain/repositories/users-repository';
 import PlacesRepositoryImpl from './data/repositories-implementation/places-repository-impl';

@@ -1,10 +1,15 @@
+/* eslint-disable no-shadow */
+/* eslint-disable semi */
+/* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
 
-export enum userRoles {
-  Administrator = 'administrator',
-  Coordinator = 'coordinator',
-  Technical = 'technical'
+enum UserRoles {
+  administrator,
+  coordinator,
+  technical
 }
+export type userRolesType = keyof typeof UserRoles;
+export const USER_ROLES_LIST = Object.values(UserRoles);
 
 export default interface User extends Document {
   name: string;
@@ -13,7 +18,7 @@ export default interface User extends Document {
   email: string;
   phone: string;
   password: string;
-  role: userRoles.Administrator | userRoles.Coordinator | userRoles.Technical;
+  role: userRolesType;
   enabled: boolean;
   createdAt?: Date;
   updatedAt?: Date;

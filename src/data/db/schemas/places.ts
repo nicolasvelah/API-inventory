@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
-import Place, { placeType } from '../../../domain/models/place';
+import Place, { PLACE_TYPE_LIST, placeType } from '../../../domain/models/place';
+
+const defaultPlaceType: placeType = 'sucursal';
 
 const schema = new Schema(
   {
@@ -8,12 +10,12 @@ const schema = new Schema(
       type: {
         type: String, // Don't do `{ location: { type: String } }`
         enum: ['Point'], // 'location.type' must be 'Point'
-        required: true,
+        required: true
       },
       coordinates: {
         type: [Number],
-        required: true,
-      },
+        required: true
+      }
     },
     mainStreet: { type: String, required: true },
     addressNumber: { type: String, required: true },
@@ -23,9 +25,9 @@ const schema = new Schema(
     state: { type: String, required: true },
     type: {
       type: String,
-      enum: [placeType.ATM, placeType.Sucursal],
-      default: placeType.Sucursal,
-    },
+      enum: PLACE_TYPE_LIST,
+      default: defaultPlaceType
+    }
   },
   { timestamps: true }
 );

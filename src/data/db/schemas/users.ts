@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
-import User, { userRoles } from '../../../domain/models/user';
+import User, { USER_ROLES_LIST, userRolesType } from '../../../domain/models/user';
+
+const defaultRole: userRolesType = 'technical';
 
 const schema = new Schema({
   name: { type: String, required: true },
@@ -10,8 +12,8 @@ const schema = new Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: [userRoles.Administrator, userRoles.Coordinator, userRoles.Technical],
-    default: userRoles.Technical,
+    enum: USER_ROLES_LIST,
+    default: defaultRole,
   },
   enabled: { type: Boolean, default: true },
 }, { timestamps: true });

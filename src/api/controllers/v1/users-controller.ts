@@ -6,7 +6,7 @@ import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
 export default class UsersController {
-  private usersRepo = Get.find<UsersRepository>(Dependencies.users);
+  private usersRepo = Get.find<UsersRepository>(Dependencies.users)!;
 
   constructor() {
     autoBind(this);
@@ -15,10 +15,14 @@ export default class UsersController {
   async create(req: Request, res: Response) {
     try {
       const user = await this.usersRepo.create({
+        name: '',
+        dateOfBirth: new Date(),
+        lastName: '',
+        phone: '',
         email: '',
         password: '',
-        type: 'admin',
-        enabled: true,
+        role: 'technical',
+        enabled: true
       });
       res.send(user);
     } catch (e) {

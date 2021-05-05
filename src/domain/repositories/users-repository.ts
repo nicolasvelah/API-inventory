@@ -1,3 +1,5 @@
+/* eslint-disable semi */
+/* eslint-disable no-unused-vars */
 import { DocumentDefinition } from 'mongoose';
 import User from '../models/user';
 

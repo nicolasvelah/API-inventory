@@ -1,20 +1,25 @@
+/* eslint-disable no-shadow */
+/* eslint-disable semi */
+/* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
 
-export enum placeType {
-  ATM = 'ATM',
-  Sucursal = 'sucursal',
+enum PlaceType {
+  AMT,
+  sucursal,
 }
+export type placeType = keyof typeof PlaceType
+export const PLACE_TYPE_LIST = Object.keys(PlaceType);
 
 export default interface Place extends Document {
   name: string;
   latLong: [number, number];
   mainStreet: string;
   addressNumber: string;
-  colony: string; //colonia
-  municipality: string; //municipio
+  colony: string;
+  municipality: string;
   city: string;
-  state: string; //estado
-  type: placeType.ATM | placeType.Sucursal;
+  state: string;
+  type: placeType;
   createdAt?: Date;
   updatedAt?: Date;
 }

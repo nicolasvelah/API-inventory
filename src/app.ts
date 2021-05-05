@@ -9,7 +9,7 @@ export default class App {
   initialize = (): Promise<void> => {
     const completer = new Completer<void>();
 
-    injectDependencies()
+    injectDependencies();
 
     apiV1(this.app);
 

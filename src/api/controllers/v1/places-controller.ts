@@ -6,7 +6,7 @@ import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
 export default class PlacesController {
-  private placesRepo = Get.find<PlacesRepository>(Dependencies.places);
+  private placesRepo = Get.find<PlacesRepository>(Dependencies.places)!;
 
   constructor() {
     autoBind(this);
@@ -15,8 +15,17 @@ export default class PlacesController {
   async create(req: Request, res: Response) {
     try {
       const place = await this.placesRepo.create({
-        
+        name: 'CC RECREO',
+        addressNumber: 'S55-18',
+        city: 'Quito',
+        colony: 'Recreo',
+        latLong: [1, 2],
+        mainStreet: '',
+        municipality: '',
+        state: '',
+        type: 'AMT'
       });
+
       res.send(place);
     } catch (e) {
       sendErrorResponse(e, res);

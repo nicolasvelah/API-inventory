@@ -9,7 +9,7 @@ class _Get {
     if (!this.data.has(key)) {
       return null;
     }
-    return this.data.get(key);
+    return this.data.get(key) as T;
   }
 }
 
