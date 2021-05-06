@@ -7,11 +7,13 @@ const schema = new Schema(
   {
     user: {
       ref: 'user',
-      type: Schema.Types.ObjectId
+      type: Schema.Types.ObjectId,
+      required: true
     },
     place: {
       ref: 'place',
-      type: Schema.Types.ObjectId
+      type: Schema.Types.ObjectId,
+      required: true
     },
     scheduledDate: { type: Date, required: true },
     arrivalDate: { type: Date, required: true },
