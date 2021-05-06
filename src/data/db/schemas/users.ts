@@ -3,20 +3,24 @@ import User, { USER_ROLES_LIST, userRolesType } from '../../../domain/models/use
 
 const defaultRole: userRolesType = 'technical';
 
-const schema = new Schema({
-  name: { type: String, required: true },
-  lastName: { type: String, required: true },
-  dateOfBirth: { type: Date, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true },
-  password: { type: String, required: true },
-  role: {
-    type: String,
-    enum: USER_ROLES_LIST,
-    default: defaultRole,
+const schema = new Schema(
+  {
+    name: { type: String, required: true },
+    lastName: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
+    password: { type: String, required: true },
+    permissions: { type: [String], required: true },
+    role: {
+      type: String,
+      enum: USER_ROLES_LIST,
+      default: defaultRole
+    },
+    enabled: { type: Boolean, default: true }
   },
-  enabled: { type: Boolean, default: true },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 const Users = model<User>('user', schema);
 export default Users;

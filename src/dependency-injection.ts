@@ -11,13 +11,16 @@ import InventoriesRepository from './domain/repositories/inventories-repository'
 import InventoriesRepositoryImpl from './data/repositories-implementation/inventories-repository-impl';
 import CatalogsRepository from './domain/repositories/catalogs-repository';
 import CatalogsRepositoryImpl from './data/repositories-implementation/catalogs-repository-impl';
+import FirebaseRepository from './domain/repositories/firebase-repository';
+import FirebaseRepositoryImpl from './data/repositories-implementation/firebase-repository-impl';
 
 export enum Dependencies {
   users = 'users',
   places = 'places',
   tasks = 'tasks',
   inventories = 'inventories',
-  catalogs = 'catalogs'
+  catalogs = 'catalogs',
+  firebase = 'firebase'
 }
 
 const injectDependencies = () => {
@@ -26,6 +29,7 @@ const injectDependencies = () => {
   Get.put<TasksRepository>(new TasksRepositoryImpl(), Dependencies.tasks);
   Get.put<InventoriesRepository>(new InventoriesRepositoryImpl(), Dependencies.inventories);
   Get.put<CatalogsRepository>(new CatalogsRepositoryImpl(), Dependencies.catalogs);
+  Get.put<FirebaseRepository>(new FirebaseRepositoryImpl(), Dependencies.firebase);
 };
 
 export default injectDependencies;

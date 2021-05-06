@@ -15,7 +15,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
 
   async getAll(): Promise<Inventory[]> {
     const places = await Inventories.find({})
-      .populate('user')
+      .populate('user', '-password')
       .populate('place')
       .populate('task')
       .populate('device');

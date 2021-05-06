@@ -5,7 +5,7 @@ import Users from '../db/schemas/users';
 
 export default class UsersRepositoryImpl implements UsersRepository {
   async getAll(): Promise<User[]> {
-    const users = await Users.find({});
+    const users = await Users.find({}, { password: 0 });
     return users;
   }
 

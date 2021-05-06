@@ -22,6 +22,7 @@ export default class App {
   initialize = async (): Promise<void> => {
     const completer = new Completer<void>();
 
+    //Connect MongoDB
     const uriMongoDB = process.env.MONGO_URI ?? '';
     const connected = await MongoDb.connect(uriMongoDB);
     if (!connected) return;

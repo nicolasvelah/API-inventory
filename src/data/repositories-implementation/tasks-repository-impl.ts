@@ -5,7 +5,7 @@ import Tasks from '../db/schemas/tasks';
 
 export default class TasksRepositoryImpl implements TasksRepository {
   async getAll(): Promise<Task[]> {
-    const tasks = await Tasks.find({}).populate('user').populate('place');
+    const tasks = await Tasks.find({}).populate('user', '-password').populate('place');
     return tasks;
   }
 

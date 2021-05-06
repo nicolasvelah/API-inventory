@@ -19,6 +19,7 @@ export default interface User extends Document {
   phone: string;
   password: string;
   role: userRolesType;
+  permissions: string[];
   enabled: boolean;
   createdAt?: Date;
   updatedAt?: Date;
