@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
-import UsersRepository from '../../../domain/repositories/users-repository';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
+import CatalogsRepository from '../../../domain/repositories/catalogs-repository';
 
-export default class UsersController {
-  private usersRepo = Get.find<UsersRepository>(Dependencies.users);
+export default class CatalogsController {
+  private catalogsRepo = Get.find<CatalogsRepository>(Dependencies.inventories)!;
 
   constructor() {
     autoBind(this);
@@ -14,19 +14,17 @@ export default class UsersController {
 
   async create(req: Request, res: Response) {
     try {
-      const { name, dateOfBirth, lastName, phone, email, password, role } = req.body;
+      const { brand, dataToCollectInterface, device, referenceModel, typePlace } = req.body;
 
-      const user = await this.usersRepo.create({
-        name,
-        dateOfBirth: new Date(dateOfBirth),
-        lastName,
-        phone,
-        email,
-        password,
-        role,
-        enabled: true
+      const inventory = await this.catalogsRepo.create({
+        brand,
+        dataToCollectInterface,
+        device,
+        referenceModel,
+        typePlace
       });
-      res.send(user);
+
+      res.send(inventory);
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -34,7 +32,7 @@ export default class UsersController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const deleted = await this.usersRepo.deleteById('ssaskasjasj');
+      const deleted = await this.catalogsRepo.deleteById('ssaskasjasj');
       res.send(deleted);
     } catch (e) {
       sendErrorResponse(e, res);
@@ -43,9 +41,8 @@ export default class UsersController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const users = await this.usersRepo.getAll();
-
-      res.send(users);
+      const inventories = await this.catalogsRepo.getAll();
+      res.send(inventories);
     } catch (e) {
       sendErrorResponse(e, res);
     }

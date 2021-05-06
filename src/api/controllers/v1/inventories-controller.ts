@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
-import PlacesRepository from '../../../domain/repositories/places-repository';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
+import InventoriesRepository from '../../../domain/repositories/inventories-repository';
 
-export default class PlacesController {
-  private placesRepo = Get.find<PlacesRepository>(Dependencies.places)!;
+export default class InventoriesController {
+  private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories)!;
 
   constructor() {
     autoBind(this);
@@ -15,30 +15,24 @@ export default class PlacesController {
   async create(req: Request, res: Response) {
     try {
       const {
-        name,
-        addressNumber,
-        city,
-        colony,
-        latLong,
-        mainStreet,
-        municipality,
-        state,
-        type
+        user,
+        task,
+        place,
+        dataCollected,
+        device,
+        state
       } = req.body;
 
-      const place = await this.placesRepo.create({
-        name,
-        addressNumber,
-        city,
-        colony,
-        latLong,
-        mainStreet,
-        municipality,
-        state,
-        type
+      const inventory = await this.inventoriesRepo.create({
+        user,
+        task,
+        place,
+        dataCollected,
+        device,
+        state
       });
 
-      res.send(place);
+      res.send(inventory);
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -46,7 +40,7 @@ export default class PlacesController {
 
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const deleted = await this.placesRepo.deleteById('ssaskasjasj');
+      const deleted = await this.inventoriesRepo.deleteById('ssaskasjasj');
       res.send(deleted);
     } catch (e) {
       sendErrorResponse(e, res);
@@ -55,8 +49,8 @@ export default class PlacesController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const places = await this.placesRepo.getAll();
-      res.send(places);
+      const inventories = await this.inventoriesRepo.getAll();
+      res.send(inventories);
     } catch (e) {
       sendErrorResponse(e, res);
     }

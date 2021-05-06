@@ -15,7 +15,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
 
   async deleteById(id: string): Promise<boolean> {
     const result = await Tasks.deleteOne({ id });
-    //console.log('result -->', result);
+
     return (result.deletedCount ?? 0) > 0;
   }
 }
