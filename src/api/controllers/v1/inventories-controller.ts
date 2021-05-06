@@ -6,7 +6,7 @@ import sendErrorResponse from '../utils/send-error';
 import InventoriesRepository from '../../../domain/repositories/inventories-repository';
 
 export default class InventoriesController {
-  private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories)!;
+  private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   constructor() {
     autoBind(this);

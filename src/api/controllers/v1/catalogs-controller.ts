@@ -6,7 +6,7 @@ import sendErrorResponse from '../utils/send-error';
 import CatalogsRepository from '../../../domain/repositories/catalogs-repository';
 
 export default class CatalogsController {
-  private catalogsRepo = Get.find<CatalogsRepository>(Dependencies.inventories)!;
+  private catalogsRepo = Get.find<CatalogsRepository>(Dependencies.catalogs);
 
   constructor() {
     autoBind(this);

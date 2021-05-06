@@ -4,7 +4,7 @@
 import { Document } from 'mongoose';
 
 enum PlaceCatalogueType {
-  AMT,
+  ATM,
   sucursal,
 }
 export type placeCatalogueType = keyof typeof PlaceCatalogueType

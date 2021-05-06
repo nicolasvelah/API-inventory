@@ -6,7 +6,7 @@ import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
 export default class PlacesController {
-  private placesRepo = Get.find<PlacesRepository>(Dependencies.places)!;
+  private placesRepo = Get.find<PlacesRepository>(Dependencies.places);
 
   constructor() {
     autoBind(this);
