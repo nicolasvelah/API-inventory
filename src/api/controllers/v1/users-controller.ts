@@ -16,6 +16,26 @@ export default class UsersController {
     autoBind(this);
   }
 
+  async login(req: Request, res: Response) {
+    try {
+      const { email, password }: { email: string; password: string } = req.body;
+      if (!email || !password) {
+        throw { code: 400, message: 'missing username or password' };
+      }
+
+      const userFoud = await this.usersRepo.findByEmailAndpassword(email, password);
+
+      if (!userFoud) throw { code: 400, message: 'missing username or password' };
+
+      const token = await this.firebaseRepo.createFirebaseToken(userFoud.id);
+
+      res.send({ user: userFoud, token });
+    } catch (error) {
+      console.log('Error in login:', error.message);
+      res.status(401).send({ message: 'Unauthorized' });
+    }
+  }
+
   async create(req: Request, res: Response) {
     try {
       const { name, dateOfBirth, lastName, phone, email, password, role } = req.body;
