@@ -17,7 +17,7 @@ export default class Middleware {
 
   // eslint-disable-next-line no-useless-constructor
   constructor() {
-    console.log('Iniciando middleware');
+    //console.log('Iniciando middleware');
   }
 
   public static getInstance(): Middleware {
@@ -45,12 +45,9 @@ export default class Middleware {
 
       const idUser = await firebaseRepo.verifyFirebaseToken(token);
       //console.log('idUser -->', idUser);
-      if (idUser) {
-        /// Esto se lo hace para tener el id del usuario en el request ya que typescript me lo percibe como un error
-        (req as any).session = { idUser };
-      } else {
-        throw { code: 401, message: 'Unauthorized' };
-      }
+      if (!idUser) throw { code: 401, message: 'Unauthorized' };
+      /// Esto se lo hace para tener el id del usuario en el request ya que typescript me lo percibe como un error
+      (req as any).session = { idUser };
 
       next();
     } catch (e) {

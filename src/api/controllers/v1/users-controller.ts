@@ -6,6 +6,7 @@ import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 import FirebaseRepository from '../../../domain/repositories/firebase-repository';
 import PERMISSIONS_USERS from '../../../helpers/permissions-user';
+import Crypt from '../../../helpers/crypt';
 
 export default class UsersController {
   private usersRepo = Get.find<UsersRepository>(Dependencies.users);
@@ -20,60 +21,84 @@ export default class UsersController {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       if (!email || !password) {
-        throw { code: 400, message: 'missing username or password' };
+        throw { code: 400, message: 'Missing username or password' };
       }
 
-      const userFoud = await this.usersRepo.findByEmailAndpassword(email, password);
+      const user = await this.usersRepo.findByEmail(email);
+      if (!user) throw { code: 400, message: 'User do not exist' };
 
-      if (!userFoud) throw { code: 400, message: 'missing username or password' };
+      const correctPassword = await Crypt.matchPassword(password, user.password);
+      if (!correctPassword) throw { code: 401, message: 'Unauthorized' };
 
-      const token = await this.firebaseRepo.createFirebaseToken(userFoud.id);
+      const token = await this.firebaseRepo.createFirebaseToken(user.id);
 
-      res.send({ user: userFoud, token });
+      const userWithoutPassword = {
+        _id: user._id,
+        name: user.name,
+        lastName: user.lastName,
+        dateOfBirth: user.dateOfBirth,
+        phone: user.phone,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions,
+        enabled: user.enabled
+      };
+      res.send({ user: userWithoutPassword, token });
     } catch (error) {
       console.log('Error in login:', error.message);
       res.status(401).send({ message: 'Unauthorized' });
     }
   }
 
-  async create(req: Request, res: Response) {
+  async signup(req: Request, res: Response) {
     try {
-      const { name, dateOfBirth, lastName, phone, email, password, role } = req.body;
+      const {
+        name,
+        dateOfBirth,
+        lastName,
+        phone,
+        email,
+        password,
+        confirmPassword,
+        role
+      } = req.body;
+
+      if (password.length < 4) {
+        throw { code: 417, message: 'Passwords must be at least 4 characters' };
+      }
+
+      if (password !== confirmPassword) {
+        throw { code: 417, message: 'Passwords do not match' };
+      }
+
+      const userFoud = await this.usersRepo.findByEmail(email);
+      if (userFoud) {
+        throw { code: 400, message: 'The Email is already in use' };
+      }
 
       const validateRol = Object.keys(PERMISSIONS_USERS).includes(role);
+      if (!validateRol) throw { code: 417, message: 'Invalid role' };
 
-      if (!validateRol) throw new Error('Invalid role');
-
+      const encryptPassword = await Crypt.encryptPassword(password);
+      if (!encryptPassword) {
+        throw { code: 500, message: 'Internal Server Error' };
+      }
       const permissions = PERMISSIONS_USERS[role as 'administrator' | 'coordinator' | 'technical'];
-
       const user = await this.usersRepo.create({
         name,
         dateOfBirth: new Date(dateOfBirth),
         lastName,
         phone,
         email,
-        password,
+        password: encryptPassword,
         role,
         permissions,
         enabled: true
       });
 
-      const treatedUser = {
-        _id: user._id,
-        enabled: user.enabled,
-        permissions: user.permissions,
-        dateOfBirth: user.dateOfBirth,
-        name,
-        lastName,
-        phone,
-        email,
-        password,
-        role
-      };
-
       const token = await this.firebaseRepo.createFirebaseToken(user.id);
 
-      res.send({ user: treatedUser, token });
+      res.send({ token });
     } catch (e) {
       sendErrorResponse(e, res);
     }

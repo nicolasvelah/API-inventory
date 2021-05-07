@@ -8,4 +8,5 @@ export default interface UsersRepository {
   getAll(): Promise<User[]>;
   deleteById(id: string): Promise<boolean>;
   findByEmailAndpassword(email: string, password: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
 }

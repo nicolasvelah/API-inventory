@@ -29,10 +29,7 @@ export default class App {
     if (!connected) return;
 
     //initialize firebase
-    const firebaseAdmin = FirebaseAdmin.getInstance();
-    if (firebaseAdmin) {
-      console.log('FIREBASE initialized');
-    }
+    FirebaseAdmin.getInstance();
 
     injectDependencies();
     this.enableCors();

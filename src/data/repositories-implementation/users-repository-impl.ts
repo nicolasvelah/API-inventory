@@ -4,8 +4,13 @@ import UsersRepository from '../../domain/repositories/users-repository';
 import Users from '../db/schemas/users';
 
 export default class UsersRepositoryImpl implements UsersRepository {
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await Users.findOne({ email });
+    return user;
+  }
+
   async findByEmailAndpassword(email: string, password: string): Promise<User | null> {
-    const user = await Users.findOne({ email, password }, { password: 0 });
+    const user = await Users.findOne({ email, password });
     return user;
   }
 

@@ -11,7 +11,7 @@ export default () => {
   router.post('/login', controller.login);
 
   //Create user
-  router.post('/', controller.create);
+  router.post('/signup', controller.signup);
 
   //Get users
   router.get('/', middleware.verifyToken, controller.getAll);
