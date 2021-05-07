@@ -13,31 +13,48 @@ import sendErrorResponse from '../controllers/utils/send-error';
 } */
 
 export default class Middleware {
+  private static instance: Middleware;
+
+  // eslint-disable-next-line no-useless-constructor
+  constructor() {
+    console.log('Iniciando middleware');
+  }
+
+  public static getInstance(): Middleware {
+    if (!Middleware.instance) {
+      Middleware.instance = new Middleware();
+    }
+    return Middleware.instance;
+  }
+
   /**
    * comprueba la session actual
    * @param req
    * @param res
    * @param next
    */
-  static async verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const firebaseRepo = Get.find<FirebaseRepository>(Dependencies.firebase);
+
       const token = req.headers['x-access-token'] as string;
       if (!token) {
         throw { code: 401, message: 'Unauthorized' };
       }
       //console.log('token -->', token.substr(0, 10));
+
       const idUser = await firebaseRepo.verifyFirebaseToken(token);
       //console.log('idUser -->', idUser);
-
       if (idUser) {
         /// Esto se lo hace para tener el id del usuario en el request ya que typescript me lo percibe como un error
         (req as any).session = { idUser };
       } else {
         throw { code: 401, message: 'Unauthorized' };
       }
+
       next();
     } catch (e) {
+      console.log('Error en verifyToken', e.message);
       sendErrorResponse(e, res);
     }
   }

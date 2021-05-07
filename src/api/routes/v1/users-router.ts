@@ -5,6 +5,7 @@ import Middleware from '../../middlewares/authentication-middleware';
 export default () => {
   const router = Router();
   const controller = new UsersController();
+  const middleware = Middleware.getInstance();
 
   //Login user
   router.post('/login', controller.login);
@@ -13,6 +14,6 @@ export default () => {
   router.post('/', controller.create);
 
   //Get users
-  router.get('/', Middleware.verifyToken, controller.getAll);
+  router.get('/', middleware.verifyToken, controller.getAll);
   return router;
 };
