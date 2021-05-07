@@ -5,6 +5,7 @@ import apiV1 from './api/routes/v1';
 import Completer from './helpers/completer';
 import injectDependencies from './dependency-injection';
 import MongoDb from './data/db';
+import FirebaseAdmin from './data/providers/remote/firebase-admin';
 
 export default class App {
   private app: Application = express();
@@ -26,6 +27,12 @@ export default class App {
     const uriMongoDB = process.env.MONGO_URI ?? '';
     const connected = await MongoDb.connect(uriMongoDB);
     if (!connected) return;
+
+    //initialize firebase
+    const firebaseAdmin = FirebaseAdmin.getInstance();
+    if (firebaseAdmin) {
+      console.log('FIREBASE initialized');
+    }
 
     injectDependencies();
     this.enableCors();

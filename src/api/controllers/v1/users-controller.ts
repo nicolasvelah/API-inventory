@@ -90,6 +90,7 @@ export default class UsersController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      console.log((req as any).session);
       const users = await this.usersRepo.getAll();
       res.send({ users });
     } catch (e) {

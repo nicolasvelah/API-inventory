@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import UsersController from '../../controllers/v1/users-controller';
+import Middleware from '../../middlewares/authentication-middleware';
 
 export default () => {
   const router = Router();
@@ -12,6 +13,6 @@ export default () => {
   router.post('/', controller.create);
 
   //Get users
-  router.get('/', controller.getAll);
+  router.get('/', Middleware.verifyToken, controller.getAll);
   return router;
 };
