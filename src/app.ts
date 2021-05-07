@@ -6,6 +6,7 @@ import Completer from './helpers/completer';
 import injectDependencies from './dependency-injection';
 import MongoDb from './data/db';
 import FirebaseAdmin from './data/providers/remote/firebase-admin';
+import EmailManager from './helpers/email-manager';
 
 export default class App {
   private app: Application = express();
@@ -30,6 +31,9 @@ export default class App {
 
     //initialize firebase
     FirebaseAdmin.getInstance();
+
+    //initialize nodemail
+    EmailManager.getInstance();
 
     injectDependencies();
     this.enableCors();

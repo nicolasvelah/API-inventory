@@ -13,6 +13,10 @@ export default () => {
   //Create user
   router.post('/signup', controller.signup);
 
+  //recover password
+  router.post('/recover', controller.recoverPassword);
+  router.post('/update-password', controller.updatePassword);
+
   //Get users
   router.get('/', middleware.verifyToken, controller.getAll);
   return router;

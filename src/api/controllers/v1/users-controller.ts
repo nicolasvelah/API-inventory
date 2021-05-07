@@ -7,6 +7,7 @@ import sendErrorResponse from '../utils/send-error';
 import FirebaseRepository from '../../../domain/repositories/firebase-repository';
 import PERMISSIONS_USERS from '../../../helpers/permissions-user';
 import Crypt from '../../../helpers/crypt';
+import EmailManager from '../../../helpers/email-manager';
 
 export default class UsersController {
   private usersRepo = Get.find<UsersRepository>(Dependencies.users);
@@ -99,6 +100,55 @@ export default class UsersController {
       const token = await this.firebaseRepo.createFirebaseToken(user.id);
 
       res.send({ token });
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async recoverPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+      const user = await this.usersRepo.findByEmail(email);
+      if (user) {
+        const emailManager = EmailManager.getInstance();
+        await emailManager.sendEmail({
+          //to: email,
+          to: 'juanaciolalangui@gmail.com',
+          html: `<div>
+          Hola
+          <a href="http://localhost:3000" target="_blank">
+          <button type="button >Reestablecer contraseña</button>
+          </a>
+          </div>`,
+          subject: 'Reestablecer contraseña'
+        });
+      }
+      res.send();
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async updatePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { password, confirmPassword, email } = req.body;
+
+      if (password !== confirmPassword) {
+        throw { code: 417, message: 'Passwords do not match' };
+      }
+
+      const user = await this.usersRepo.findByEmail(email);
+      if (!user) throw { code: 400, message: 'User not foud' };
+
+      const encryptPassword = await Crypt.encryptPassword(password);
+      if (!encryptPassword) {
+        throw { code: 500, message: 'Internal Server Error' };
+      }
+
+      user.password = encryptPassword;
+      await user.save();
+
+      res.send({ message: 'Password Updated' });
     } catch (e) {
       sendErrorResponse(e, res);
     }
