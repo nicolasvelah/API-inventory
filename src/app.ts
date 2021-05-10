@@ -7,6 +7,7 @@ import injectDependencies from './dependency-injection';
 import MongoDb from './data/db';
 import FirebaseAdmin from './data/providers/remote/firebase-admin';
 import EmailManager from './helpers/email-manager';
+import validationMiddlewareParams from './api/middlewares/validate/index';
 
 export default class App {
   private app: Application = express();
@@ -19,6 +20,10 @@ export default class App {
     this.app.use(cors()); // enable cors
     this.app.use(json()); // convert the incomming request to json
     this.app.use(urlencoded({ extended: false })); // urlencoded to false
+  };
+
+  private validationMiddleware = () => {
+    this.app.use(validationMiddlewareParams);
   };
 
   initialize = async (): Promise<void> => {
@@ -39,6 +44,9 @@ export default class App {
     this.enableCors();
 
     apiV1(this.app);
+
+    // validation middleware
+    this.validationMiddleware();
 
     const PORT = process.env.PORT ?? 5000;
     this.app.listen(PORT, () => {

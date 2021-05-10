@@ -10,14 +10,18 @@ const schema = new Schema(
     dateOfBirth: { type: Date, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
-    password: { type: String, required: true },
+    password: { type: String },
     permissions: { type: [String], required: true },
     role: {
       type: String,
       enum: USER_ROLES_LIST,
       default: defaultRole
     },
-    enabled: { type: Boolean, default: true }
+    enabled: { type: Boolean, default: true },
+    user: {
+      ref: 'user',
+      type: Schema.Types.ObjectId,
+    },
   },
   { timestamps: true }
 );

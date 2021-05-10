@@ -15,7 +15,7 @@ export default class UsersRepositoryImpl implements UsersRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await Users.findOne({ email });
+    const user = await Users.findOne({ email }).populate('user', '-password');
     return user;
   }
 
@@ -25,7 +25,7 @@ export default class UsersRepositoryImpl implements UsersRepository {
   }
 
   async getAll(): Promise<User[]> {
-    const users = await Users.find({}, { password: 0 });
+    const users = await Users.find({}, { password: 0 }).populate('user', '-password');
     return users;
   }
 

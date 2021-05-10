@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-namespace */
 import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { Dependencies } from '../../dependency-injection';
 import Get from '../../helpers/get';
 import FirebaseRepository from '../../domain/repositories/firebase-repository';
@@ -15,10 +16,10 @@ import sendErrorResponse from '../controllers/utils/send-error';
 export default class Middleware {
   private static instance: Middleware;
 
-  // eslint-disable-next-line no-useless-constructor
+  /*   // eslint-disable-next-line no-useless-constructor
   constructor() {
     //console.log('Iniciando middleware');
-  }
+  } */
 
   public static getInstance(): Middleware {
     if (!Middleware.instance) {
@@ -41,17 +42,30 @@ export default class Middleware {
       if (!token) {
         throw { code: 401, message: 'Unauthorized' };
       }
-      //console.log('token -->', token.substr(0, 10));
 
       const idUser = await firebaseRepo.verifyFirebaseToken(token);
-      //console.log('idUser -->', idUser);
       if (!idUser) throw { code: 401, message: 'Unauthorized' };
       /// Esto se lo hace para tener el id del usuario en el request ya que typescript me lo percibe como un error
       (req as any).session = { idUser };
 
       next();
     } catch (e) {
-      console.log('Error en verifyToken', e.message);
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async verifyPublicToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const token = req.headers['x-access-token'] as string;
+      if (!token) {
+        throw { code: 401, message: 'Unauthorized' };
+      }
+
+      const data: any = jwt.verify(token, process.env.JWT_SECRET!);
+      if (!(data && data.email && data.public)) throw { code: 401, message: 'Unauthorized' };
+
+      next();
+    } catch (e) {
       sendErrorResponse(e, res);
     }
   }

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
+import jwt from 'jsonwebtoken';
 import { Dependencies } from '../../../dependency-injection';
 import UsersRepository from '../../../domain/repositories/users-repository';
 import Get from '../../../helpers/get';
@@ -8,6 +9,7 @@ import FirebaseRepository from '../../../domain/repositories/firebase-repository
 import PERMISSIONS_USERS from '../../../helpers/permissions-user';
 import Crypt from '../../../helpers/crypt';
 import EmailManager from '../../../helpers/email-manager';
+import User, { userRolesType } from '../../../domain/models/user';
 
 export default class UsersController {
   private usersRepo = Get.find<UsersRepository>(Dependencies.users);
@@ -28,7 +30,7 @@ export default class UsersController {
       const user = await this.usersRepo.findByEmail(email);
       if (!user) throw { code: 400, message: 'User do not exist' };
 
-      const correctPassword = await Crypt.matchPassword(password, user.password);
+      const correctPassword = await Crypt.matchPassword(password, user.password ?? '');
       if (!correctPassword) throw { code: 401, message: 'Unauthorized' };
 
       const token = await this.firebaseRepo.createFirebaseToken(user.id);
@@ -42,35 +44,36 @@ export default class UsersController {
         email: user.email,
         role: user.role,
         permissions: user.permissions,
-        enabled: user.enabled
+        enabled: user.enabled,
+        user: user.user
       };
       res.send({ user: userWithoutPassword, token });
     } catch (error) {
-      console.log('Error in login:', error.message);
       res.status(401).send({ message: 'Unauthorized' });
     }
   }
 
-  async signup(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
     try {
       const {
         name,
-        dateOfBirth,
         lastName,
-        phone,
+        dateOfBirth,
         email,
-        password,
-        confirmPassword,
-        role
+        phone,
+        enabled,
+        role,
+        idManager
+      }: {
+        name: string;
+        lastName: string;
+        dateOfBirth: string;
+        email: string;
+        phone: string;
+        enabled: boolean;
+        role: userRolesType;
+        idManager?: string;
       } = req.body;
-
-      if (password.length < 4) {
-        throw { code: 417, message: 'Passwords must be at least 4 characters' };
-      }
-
-      if (password !== confirmPassword) {
-        throw { code: 417, message: 'Passwords do not match' };
-      }
 
       const userFoud = await this.usersRepo.findByEmail(email);
       if (userFoud) {
@@ -80,26 +83,24 @@ export default class UsersController {
       const validateRol = Object.keys(PERMISSIONS_USERS).includes(role);
       if (!validateRol) throw { code: 417, message: 'Invalid role' };
 
-      const encryptPassword = await Crypt.encryptPassword(password);
-      if (!encryptPassword) {
-        throw { code: 500, message: 'Internal Server Error' };
-      }
-      const permissions = PERMISSIONS_USERS[role as 'administrator' | 'coordinator' | 'technical'];
+      const permissions = PERMISSIONS_USERS[role];
       const user = await this.usersRepo.create({
         name,
         dateOfBirth: new Date(dateOfBirth),
         lastName,
         phone,
         email,
-        password: encryptPassword,
         role,
         permissions,
-        enabled: true
+        enabled,
+        user: idManager as User | undefined // Esto se le hace para poder hacer la relación en mongodb
       });
 
-      const token = await this.firebaseRepo.createFirebaseToken(user.id);
+      if (!user) throw { code: 500, message: 'Interval server error' };
 
-      res.send({ token });
+      await this.sendEmailToResetPassword(user.email);
+
+      res.send({ user, message: 'User created' });
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -110,18 +111,7 @@ export default class UsersController {
       const { email } = req.body;
       const user = await this.usersRepo.findByEmail(email);
       if (user) {
-        const emailManager = EmailManager.getInstance();
-        await emailManager.sendEmail({
-          //to: email,
-          to: 'bjuanacio@pas-hq.com',
-          html: `<div>
-          Hola
-          <a href="http://localhost:3000" target="_blank">
-          <button type="button>Reestablecer contraseña</button>
-          </a>
-          </div>`,
-          subject: 'Reestablecer contraseña'
-        });
+        await this.sendEmailToResetPassword(user.email);
       }
       res.send({ message: 'Email sent' });
     } catch (e) {
@@ -165,11 +155,29 @@ export default class UsersController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      console.log((req as any).session);
       const users = await this.usersRepo.getAll();
       res.send({ users });
     } catch (e) {
       sendErrorResponse(e, res);
     }
+  }
+
+  private async sendEmailToResetPassword(email: string) {
+    const expiresIn = 60 * 30; // 30 mins in seconds
+    const token = jwt.sign({ email, public: true }, process.env.JWT_SECRET!, { expiresIn });
+    console.log('token -->', token);
+
+    const emailManager = EmailManager.getInstance();
+    await emailManager.sendEmail({
+      //to: email,
+      to: 'bjuanacio@pas-hq.com',
+      html: `<div>
+          Hola
+          <a href="http://localhost:3000/reset/${token}" target="_blank">
+            ir a link
+          </a>
+          </div>`,
+      subject: 'Reestablecer contraseña'
+    });
   }
 }

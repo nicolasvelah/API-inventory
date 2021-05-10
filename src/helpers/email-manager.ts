@@ -24,7 +24,6 @@ export default class EmailManager {
         pass: process.env.SMTP_PASS
       }
     };
-    //console.log('Options -->', options);
     this.transporter = nodemailer.createTransport(options);
   }
 
@@ -43,7 +42,6 @@ export default class EmailManager {
         subject: data.subject,
         html: data.html,
       };
-      //console.log('mailOptions -->', mailOptions);
       return this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.log('Error en sendEmail:', error.message);

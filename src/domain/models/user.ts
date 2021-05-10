@@ -17,10 +17,11 @@ export default interface User extends Document {
   dateOfBirth: Date;
   email: string;
   phone: string;
-  password: string;
+  password?: string;
   role: userRolesType;
   permissions: string[];
   enabled: boolean;
+  user?: User;
   createdAt?: Date;
   updatedAt?: Date;
 }
