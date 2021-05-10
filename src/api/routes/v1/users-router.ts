@@ -15,8 +15,16 @@ export default () => {
   router.post('/create', ValidateUser.createValidation(), controller.create); // put middleware.verifyToken
 
   //recover password
-  router.post('/recover', controller.recoverPassword);
-  router.post('/update-password', middleware.verifyPublicToken, controller.updatePassword);
+  router.post('/recover', ValidateUser.recoverValidation(), controller.recoverPassword);
+  router.post(
+    '/update-password',
+    middleware.verifyPublicToken,
+    ValidateUser.updatePasswordValidation(),
+    controller.updatePassword
+  );
+
+  //Update user
+  router.put('/:id', ValidateUser.updateValidation(), controller.update); // put middleware.verifyToken
 
   //Get users
   router.get('/', controller.getAll); // put middleware.verifyToken

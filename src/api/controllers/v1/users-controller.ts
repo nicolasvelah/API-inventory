@@ -108,7 +108,7 @@ export default class UsersController {
 
   async recoverPassword(req: Request, res: Response): Promise<void> {
     try {
-      const { email } = req.body;
+      const { email }: { email: string } = req.body;
       const user = await this.usersRepo.findByEmail(email);
       if (user) {
         await this.sendEmailToResetPassword(user.email);
@@ -162,6 +162,35 @@ export default class UsersController {
     }
   }
 
+  async update(req: Request, res: Response) {
+    try {
+      const {
+        phone,
+        role,
+        enabled
+      }: { phone?: string; role?: userRolesType; enabled?: boolean } = req.body;
+
+      const { id }: { id: string } = (req as any).session;
+
+      if (role) {
+        const validateRol = Object.keys(PERMISSIONS_USERS).includes(role ?? '');
+        if (!validateRol) throw { code: 417, message: 'Invalid role' };
+      }
+
+      const user = await this.usersRepo.getById(id);
+      if (!user) throw { code: 400, message: 'User not foud' };
+
+      user.phone = phone ?? user.phone;
+      user.role = role ?? user.role;
+      user.enabled = enabled === undefined ? user.enabled : enabled;
+      await user.save();
+
+      res.send({ message: 'User updated' });
+    } catch (error) {
+      sendErrorResponse(error, res);
+    }
+  }
+
   private async sendEmailToResetPassword(email: string) {
     const expiresIn = 60 * 30; // 30 mins in seconds
     const token = jwt.sign({ email, public: true }, process.env.JWT_SECRET!, { expiresIn });
@@ -169,8 +198,8 @@ export default class UsersController {
 
     const emailManager = EmailManager.getInstance();
     await emailManager.sendEmail({
-      //to: email,
-      to: 'bjuanacio@pas-hq.com',
+      to: email,
+      //to: 'bjuanacio@pas-hq.com',
       html: `<div>
           Hola
           <a href="http://localhost:3000/reset/${token}" target="_blank">

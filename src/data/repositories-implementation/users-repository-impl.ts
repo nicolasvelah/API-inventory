@@ -37,4 +37,8 @@ export default class UsersRepositoryImpl implements UsersRepository {
     const result = await Users.deleteOne({ _id: id });
     return (result.deletedCount ?? 0) > 0;
   }
+
+  async getById(id: string): Promise<User | null> {
+    return Users.findById({ _id: id });
+  }
 }

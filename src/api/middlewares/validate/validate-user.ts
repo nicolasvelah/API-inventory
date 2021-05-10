@@ -2,7 +2,7 @@ import { validate, Joi, schema } from 'express-validation';
 
 export default class ValidateUser {
   static loginValidation() {
-    const loginValidationParams: schema = {
+    const validationParams: schema = {
       body: Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string()
@@ -10,11 +10,11 @@ export default class ValidateUser {
           .required()
       })
     };
-    return validate(loginValidationParams);
+    return validate(validationParams);
   }
 
   static createValidation() {
-    const loginValidationParams: schema = {
+    const validationParams: schema = {
       body: Joi.object({
         name: Joi.string().required(),
         lastName: Joi.string().required(),
@@ -28,6 +28,37 @@ export default class ValidateUser {
         idManager: Joi.string()
       })
     };
-    return validate(loginValidationParams);
+    return validate(validationParams);
+  }
+
+  static recoverValidation() {
+    const validationParams: schema = {
+      body: Joi.object({
+        email: Joi.string().email().required()
+      })
+    };
+    return validate(validationParams);
+  }
+
+  static updatePasswordValidation() {
+    const validationParams: schema = {
+      body: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().email().required(),
+        confirmPassword: Joi.string().email().required()
+      })
+    };
+    return validate(validationParams);
+  }
+
+  static updateValidation() {
+    const validationParams: schema = {
+      body: Joi.object({
+        phone: Joi.string().regex(/[0-9]{7,30}/),
+        role: Joi.string(),
+        enabled: Joi.boolean()
+      })
+    };
+    return validate(validationParams);
   }
 }
