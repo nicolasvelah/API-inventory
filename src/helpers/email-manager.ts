@@ -14,15 +14,18 @@ export default class EmailManager {
 
   constructor() {
     const PORT = 465;
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_URL,
+    const options = {
+      //host: process.env.SMTP_URL,
+      host: 'smtp.gmail.com', // For tests
       port: PORT,
       secure: PORT === 465, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
       }
-    });
+    };
+    //console.log('Options -->', options);
+    this.transporter = nodemailer.createTransport(options);
   }
 
   public static getInstance(): EmailManager {
@@ -33,12 +36,18 @@ export default class EmailManager {
   }
 
   async sendEmail(data: SendEmailManagerData): Promise<any> {
-    const mailOptions = {
-      from: '"Bojuan 👻"  <bjuanacio@pas-hq.com>',
-      to: data.to,
-      subject: data.subject,
-      html: data.html
-    };
-    return this.transporter.sendMail(mailOptions);
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_USER,
+        to: data.to,
+        subject: data.subject,
+        html: data.html,
+      };
+      //console.log('mailOptions -->', mailOptions);
+      return this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.log('Error en sendEmail:', error.message);
+      return null;
+    }
   }
 }

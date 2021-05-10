@@ -113,17 +113,17 @@ export default class UsersController {
         const emailManager = EmailManager.getInstance();
         await emailManager.sendEmail({
           //to: email,
-          to: 'juanaciolalangui@gmail.com',
+          to: 'bjuanacio@pas-hq.com',
           html: `<div>
           Hola
           <a href="http://localhost:3000" target="_blank">
-          <button type="button >Reestablecer contraseña</button>
+          <button type="button>Reestablecer contraseña</button>
           </a>
           </div>`,
           subject: 'Reestablecer contraseña'
         });
       }
-      res.send();
+      res.send({ message: 'Email sent' });
     } catch (e) {
       sendErrorResponse(e, res);
     }
