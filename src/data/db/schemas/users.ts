@@ -1,7 +1,5 @@
 import { Schema, model } from 'mongoose';
-import User, { USER_ROLES_LIST, userRolesType } from '../../../domain/models/user';
-
-const defaultRole: userRolesType = 'technical';
+import User, { USER_ROLES_LIST, defaultRole } from '../../../domain/models/user';
 
 const schema = new Schema(
   {
@@ -18,10 +16,10 @@ const schema = new Schema(
       default: defaultRole
     },
     enabled: { type: Boolean, default: true },
-    user: {
+    coordinator: {
       ref: 'user',
-      type: Schema.Types.ObjectId,
-    },
+      type: Schema.Types.ObjectId
+    }
   },
   { timestamps: true }
 );

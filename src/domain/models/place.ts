@@ -5,14 +5,17 @@ import { Document } from 'mongoose';
 
 enum PlaceType {
   ATM,
-  sucursal,
+  sucursal
 }
-export type placeType = keyof typeof PlaceType
+export type placeType = keyof typeof PlaceType;
 export const PLACE_TYPE_LIST = Object.keys(PlaceType);
 
 export default interface Place extends Document {
   name: string;
-  latLong: [number, number];
+  latLong: {
+    type: 'Point';
+    coordinates: Number[];
+  };
   mainStreet: string;
   addressNumber: string;
   colony: string;

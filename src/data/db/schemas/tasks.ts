@@ -1,11 +1,12 @@
 import { Schema, model } from 'mongoose';
 import Task, { TASK_TYPE_LIST, taskType } from '../../../domain/models/task';
+import pointSchema from './point';
 
 const defaultType: taskType = 'maintenance';
 
 const schema = new Schema(
   {
-    user: {
+    technical: {
       ref: 'user',
       type: Schema.Types.ObjectId,
       required: true
@@ -17,16 +18,10 @@ const schema = new Schema(
     },
     scheduledDate: { type: Date, required: true },
     arrivalDate: { type: Date, required: true },
-    arrivalLatLong: {
-      type: [Number],
-      required: true
-    },
+    arrivalLatLong: pointSchema,
     arrivalPhoto: { type: String, required: true },
     closeDate: { type: Date, required: true },
-    closeLatLong: {
-      type: [Number],
-      required: true
-    },
+    closeLatLong: pointSchema,
     closePhoto: { type: String, required: true },
     type: {
       type: String,

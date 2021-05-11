@@ -1,15 +1,13 @@
 import { Schema, model } from 'mongoose';
 import Place, { PLACE_TYPE_LIST, placeType } from '../../../domain/models/place';
+import pointSchema from './point';
 
 const defaultPlaceType: placeType = 'sucursal';
 
 const schema = new Schema(
   {
     name: { type: String, required: true },
-    latLong: {
-      type: [Number],
-      required: true
-    },
+    coords: pointSchema,
     mainStreet: { type: String, required: true },
     addressNumber: { type: String, required: true },
     colony: { type: String, required: true },
