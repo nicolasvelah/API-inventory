@@ -28,5 +28,6 @@ export default () => {
 
   //Get users
   router.get('/', controller.getAll); // put middleware.verifyToken
+  router.get('/:value', controller.findByValue); // put middleware.verifyToken
   return router;
 };

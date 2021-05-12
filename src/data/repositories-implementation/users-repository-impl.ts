@@ -4,6 +4,19 @@ import UsersRepository from '../../domain/repositories/users-repository';
 import Users from '../db/schemas/users';
 
 export default class UsersRepositoryImpl implements UsersRepository {
+  async findByValue(value: string): Promise<User[]> {
+    const searchRgx = this.rgx(value);
+    const users = await Users.find({
+      $or: [
+        { name: { $regex: searchRgx, $options: 'i' } },
+        { lastName: { $regex: searchRgx, $options: 'i' } },
+        { email: { $regex: searchRgx, $options: 'i' } }
+      ]
+    });
+
+    return users;
+  }
+
   async updatePasswordByEmail(email: string, password: string): Promise<User | null> {
     const updated = await Users.findOneAndUpdate(
       { email },
@@ -40,5 +53,9 @@ export default class UsersRepositoryImpl implements UsersRepository {
 
   async getById(id: string): Promise<User | null> {
     return Users.findById({ _id: id });
+  }
+
+  private rgx(pattern: string): RegExp {
+    return new RegExp(`.*${pattern}.*`);
   }
 }

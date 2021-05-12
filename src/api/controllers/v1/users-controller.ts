@@ -191,6 +191,16 @@ export default class UsersController {
     }
   }
 
+  async findByValue(req: Request, res: Response) {
+    try {
+      const { value } = req.params;
+      const users = await this.usersRepo.findByValue(value);
+      res.send({ users });
+    } catch (error) {
+      sendErrorResponse(error, res);
+    }
+  }
+
   private async sendEmailToResetPassword(email: string) {
     const expiresIn = 60 * 30; // 30 mins in seconds
     const token = jwt.sign({ email, public: true }, process.env.JWT_SECRET!, { expiresIn });

@@ -11,6 +11,7 @@ export interface TasksByUser {
 
 export default interface TasksRepository {
   getGroupByUser(): Promise<User[]>;
+  getGroupByUserAndUserId(userId: string): Promise<User[]>;
   create(data: DocumentDefinition<Task>): Promise<Task>;
   deleteById(id: string): Promise<boolean>;
   getAll(): Promise<Task[]>;
