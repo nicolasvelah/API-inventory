@@ -19,7 +19,7 @@ export default class PlacesController {
         addressNumber,
         city,
         colony,
-        latLong,
+        coords,
         mainStreet,
         municipality,
         state,
@@ -31,7 +31,10 @@ export default class PlacesController {
         addressNumber,
         city,
         colony,
-        latLong,
+        coords: {
+          type: 'Point',
+          coordinates: coords
+        },
         mainStreet,
         municipality,
         state,

@@ -20,9 +20,9 @@ const schema = new Schema(
     arrivalDate: { type: Date, required: true },
     arrivalLatLong: pointSchema,
     arrivalPhoto: { type: String, required: true },
-    closeDate: { type: Date, required: true },
-    closeLatLong: pointSchema,
-    closePhoto: { type: String, required: true },
+    closedDate: { type: Date, required: true },
+    closedLatLong: pointSchema,
+    closedPhoto: { type: String, required: true },
     type: {
       type: String,
       enum: TASK_TYPE_LIST,

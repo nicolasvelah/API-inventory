@@ -4,6 +4,7 @@
 import { Document } from 'mongoose';
 import User from './user';
 import Place from './place';
+import Point from './point';
 
 enum TaskType {
   installation,
@@ -14,15 +15,15 @@ export type taskType = keyof typeof TaskType;
 export const TASK_TYPE_LIST = Object.keys(TaskType);
 
 export default interface Task extends Document {
-  user: User;
+  technical: User;
   place: Place;
   scheduledDate: Date;
   arrivalDate: Date;
-  arrivalLatLong: [number, number];
+  arrivalLatLong: Point;
   arrivalPhoto: string;
-  closeDate: Date;
-  closeLatLong: [number, number];
-  closePhoto: string;
+  closedDate: Date;
+  closedLatLong: Point;
+  closedPhoto: string;
   type: taskType;
   createdAt?: Date;
   updatedAt?: Date;

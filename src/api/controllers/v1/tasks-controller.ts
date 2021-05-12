@@ -15,27 +15,33 @@ export default class TasksController {
   async create(req: Request, res: Response) {
     try {
       const {
-        user,
-        place,
+        idTechnical,
+        idPlace,
         arrivalDate,
         arrivalLatLong,
         arrivalPhoto,
-        closeDate,
-        closeLatLong,
-        closePhoto,
+        closedDate,
+        closedLatLong,
+        closedPhoto,
         scheduledDate,
         type
       } = req.body;
 
       const task = await this.tasksRepo.create({
-        user,
-        place,
+        technical: idTechnical,
+        place: idPlace,
         arrivalDate: new Date(arrivalDate),
-        arrivalLatLong,
+        arrivalLatLong: {
+          type: 'Point',
+          coordinates: arrivalLatLong
+        },
         arrivalPhoto,
-        closeDate: new Date(closeDate),
-        closeLatLong,
-        closePhoto,
+        closedDate: new Date(closedDate),
+        closedLatLong: {
+          type: 'Point',
+          coordinates: closedLatLong
+        },
+        closedPhoto,
         scheduledDate: new Date(scheduledDate),
         type
       });
@@ -57,8 +63,19 @@ export default class TasksController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      const resp = await this.tasksRepo.getGroupByUser();
+      console.log('resp -->', resp[0]);
       const tasks = await this.tasksRepo.getAll();
       res.send(tasks);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getGroupByUser(req: Request, res: Response): Promise<void> {
+    try {
+      const users = await this.tasksRepo.getGroupByUser();
+      res.send(users);
     } catch (e) {
       sendErrorResponse(e, res);
     }

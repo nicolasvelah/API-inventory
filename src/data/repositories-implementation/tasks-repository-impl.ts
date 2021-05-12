@@ -1,11 +1,13 @@
-import { DocumentDefinition } from 'mongoose';
+import { DocumentDefinition, Types } from 'mongoose';
 import Task from '../../domain/models/task';
-import TasksRepository, { TasksByUser } from '../../domain/repositories/tasks-repository';
+import TasksRepository from '../../domain/repositories/tasks-repository';
 import Tasks from '../db/schemas/tasks';
+import User from '../../domain/models/user';
 
 export default class TasksRepositoryImpl implements TasksRepository {
-  async getGroupByUser(): Promise<TasksByUser[]> {
-    const result = await Tasks.aggregate([
+  async getGroupByUser(): Promise<User[]> {
+    /*
+    [
       {
         $lookup: {
           from: 'users',
@@ -30,12 +32,62 @@ export default class TasksRepositoryImpl implements TasksRepository {
           tasks: 1
         }
       }
+    ]
+    */
+    const id = Types.ObjectId('609afe7b0e9ab02e3ea0ee73');
+
+    const result = await Tasks.aggregate([
+      {
+        $match: {
+          technical: id
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          as: 'technical',
+          localField: 'technical',
+          foreignField: '_id'
+        }
+      },
+      { $unwind: '$technical' },
+      {
+        $group: {
+          _id: '$technical',
+          tasks: {
+            $push: '$$ROOT'
+          }
+        }
+      }
+      /* {
+        $project: {
+          _id: 0,
+          technical: 1,
+          tasks: 1
+        }
+      } */
     ]);
-    return result;
+    //console.log('result -->', result);
+    const orderData = result.map((item: any) => {
+      const tasksMap: Task[] = item.tasks.map((task: Task) => {
+        const { technical, ...newTask } = task;
+        return newTask;
+      });
+      const user: User = {
+        ...item._id,
+        tasks: tasksMap
+      };
+      return user;
+    });
+    //console.log('orderData -->', orderData);
+    //console.log('orderData lenght -->', orderData.length);
+    return orderData;
+
+    //return result;
   }
 
   async getAll(): Promise<Task[]> {
-    const tasks = await Tasks.find({}).populate('user', '-password').populate('place');
+    const tasks = await Tasks.find({}).populate('technical', '-password').populate('place');
     return tasks;
   }
 

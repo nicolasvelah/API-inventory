@@ -25,7 +25,7 @@ export default class ValidateUser {
           .required(),
         role: Joi.string().required(),
         enabled: Joi.boolean().required(),
-        idManager: Joi.string()
+        idCoordinator: Joi.string()
       })
     };
     return validate(validationParams);

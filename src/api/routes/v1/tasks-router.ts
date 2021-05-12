@@ -7,8 +7,9 @@ export default () => {
   const middleware = Middleware.getInstance();
   const controller = new TasksController();
 
-  router.post('/', middleware.verifyToken, controller.create);
+  router.post('/create', controller.create); // put middleware.verifyToken
   router.delete('/:id', middleware.verifyToken, controller.delete);
-  router.get('/', middleware.verifyToken, controller.getAll);
+  router.get('/', controller.getAll); // middleware.verifyToken
+  router.get('/getGroupByUser', controller.getGroupByUser);
   return router;
 };

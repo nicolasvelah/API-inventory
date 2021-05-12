@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { DocumentDefinition, Types } from 'mongoose';
 import Task from '../models/task';
+import User from '../models/user';
 
 export interface TasksByUser {
   _id: Types.ObjectId;
@@ -9,7 +10,7 @@ export interface TasksByUser {
 }
 
 export default interface TasksRepository {
-  getGroupByUser(): Promise<TasksByUser[]>;
+  getGroupByUser(): Promise<User[]>;
   create(data: DocumentDefinition<Task>): Promise<Task>;
   deleteById(id: string): Promise<boolean>;
   getAll(): Promise<Task[]>;

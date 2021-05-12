@@ -2,6 +2,7 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
+import Point from './point';
 
 enum PlaceType {
   ATM,
@@ -12,10 +13,7 @@ export const PLACE_TYPE_LIST = Object.keys(PlaceType);
 
 export default interface Place extends Document {
   name: string;
-  latLong: {
-    type: 'Point';
-    coordinates: Number[];
-  };
+  coords: Point;
   mainStreet: string;
   addressNumber: string;
   colony: string;

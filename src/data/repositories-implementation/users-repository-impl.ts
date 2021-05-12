@@ -25,7 +25,7 @@ export default class UsersRepositoryImpl implements UsersRepository {
   }
 
   async getAll(): Promise<User[]> {
-    const users = await Users.find({}, { password: 0 }).populate('user', '-password');
+    const users = await Users.find({}, { password: 0 }).populate('coordinator', '-password');
     return users;
   }
 

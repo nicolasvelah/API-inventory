@@ -22,7 +22,7 @@ export default interface User extends Document {
   role: userRolesType;
   permissions: string[];
   enabled: boolean;
-  user?: User;
+  coordinator?: User;
   createdAt?: Date;
   updatedAt?: Date;
 }

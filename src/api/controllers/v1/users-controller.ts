@@ -45,7 +45,7 @@ export default class UsersController {
         role: user.role,
         permissions: user.permissions,
         enabled: user.enabled,
-        user: user.user
+        coordinator: user.coordinator
       };
       res.send({ user: userWithoutPassword, token });
     } catch (error) {
@@ -63,7 +63,7 @@ export default class UsersController {
         phone,
         enabled,
         role,
-        idManager
+        idCoordinator
       }: {
         name: string;
         lastName: string;
@@ -72,7 +72,7 @@ export default class UsersController {
         phone: string;
         enabled: boolean;
         role: userRolesType;
-        idManager?: string;
+        idCoordinator?: string;
       } = req.body;
 
       const userFoud = await this.usersRepo.findByEmail(email);
@@ -93,7 +93,7 @@ export default class UsersController {
         role,
         permissions,
         enabled,
-        user: idManager as User | undefined // Esto se le hace para poder hacer la relación en mongodb
+        coordinator: idCoordinator as User | undefined // Esto se le hace para poder hacer la relación en mongodb
       });
 
       if (!user) throw { code: 500, message: 'Interval server error' };
