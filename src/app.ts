@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import http from 'http';
 import { json, urlencoded } from 'body-parser';
 import apiV1 from './api/routes/v1';
 import Completer from './helpers/completer';
@@ -11,6 +12,8 @@ import validationMiddlewareParams from './api/middlewares/validate/index';
 
 export default class App {
   private app: Application = express();
+
+  private server?: http.Server;
 
   /**
    * enable the api cors, body parser
@@ -40,7 +43,8 @@ export default class App {
     //initialize nodemail
     EmailManager.getInstance();
 
-    injectDependencies();
+    this.server = new http.Server(this.app);
+    injectDependencies('/v1', this.server);
     this.enableCors();
 
     apiV1(this.app);
@@ -49,7 +53,7 @@ export default class App {
     this.validationMiddleware();
 
     const PORT = process.env.PORT ?? 5000;
-    this.app.listen(PORT, () => {
+    this.server.listen(PORT, () => {
       console.log('Server listening on port', PORT);
       completer.complete();
     });
