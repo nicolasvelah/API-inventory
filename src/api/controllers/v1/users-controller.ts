@@ -144,10 +144,11 @@ export default class UsersController {
     }
   }
 
-  async delete(req: Request, res: Response): Promise<void> {
+  async deleteById(req: Request, res: Response): Promise<void> {
     try {
-      const deleted = await this.usersRepo.deleteById('ssaskasjasj');
-      res.send(deleted);
+      const { id } = req.params;
+      const deleted = await this.usersRepo.deleteById(id);
+      res.send({ deleted });
     } catch (e) {
       sendErrorResponse(e, res);
     }

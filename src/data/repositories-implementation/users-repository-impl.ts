@@ -47,6 +47,13 @@ export default class UsersRepositoryImpl implements UsersRepository {
   }
 
   async deleteById(id: string): Promise<boolean> {
+    /*
+      No puedo buscar por la referancia para la elimincación en cascada
+    */
+    // const idUser = Types.ObjectId(id)
+    //const user = await Tasks.find({ technical: id });
+    //const user = await Tasks.find({ technical: idUser });
+
     const result = await Users.deleteOne({ _id: id });
     return (result.deletedCount ?? 0) > 0;
   }
