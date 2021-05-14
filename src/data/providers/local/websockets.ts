@@ -24,6 +24,7 @@ export default class Websockets {
         const { token }: { token: string } = socket.handshake.query as any;
         if (token) {
           const idUser = await firebaseRepo.verifyFirebaseToken(token);
+          console.log('idUser -->', idUser);
           if (!idUser) throw { code: 401, message: 'WS access denied' };
           // eslint-disable-next-line no-param-reassign
           (socket.handshake.query as any).data = {
@@ -42,9 +43,11 @@ export default class Websockets {
   private onConnection = (nsp: Namespace): void => {
     nsp.on('connection', (socket: Socket) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { idUser }: { idUser: string; } = (socket.handshake.query as any).data;
+      const { idUser }: { idUser: string } = (socket.handshake.query as any).data;
       socket.join(idUser);
+      console.log('Connect -->', { idUser, socketId: socket.id });
       nsp.to(socket.id).emit('connected', socket.id); // emit conneted event
+      //socket.broadcast.to(idUser).emit('connected', socket.id);
     });
   };
 
