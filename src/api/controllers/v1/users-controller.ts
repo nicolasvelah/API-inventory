@@ -156,6 +156,7 @@ export default class UsersController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      console.log('getAll');
       const users = await this.usersRepo.getAll();
       res.send({ users });
     } catch (e) {
@@ -194,9 +195,22 @@ export default class UsersController {
 
   async findByValue(req: Request, res: Response) {
     try {
+      console.log('findByValue');
       const { value } = req.params;
       const users = await this.usersRepo.findByValue(value);
       res.send({ users });
+    } catch (error) {
+      sendErrorResponse(error, res);
+    }
+  }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      console.log('id -->', id);
+      const user = await this.usersRepo.getById(id);
+      if (!user) throw { code: 404, message: 'User not found' };
+      res.send({ user });
     } catch (error) {
       sendErrorResponse(error, res);
     }
