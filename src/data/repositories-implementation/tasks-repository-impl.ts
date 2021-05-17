@@ -32,6 +32,46 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
+  async getAllByIdUser(userId: string): Promise<Task[]> {
+    const tasks = await Tasks.find({})
+      .populate({
+        path: 'technical',
+        select: '-password',
+        populate: {
+          path: 'coordinator',
+          select: '-password',
+          match: { _id: userId }
+        }
+      })
+      .populate('place');
+
+    const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
+    return filteredTasks;
+  }
+
+  async getAllByIdUserAndRangeDates(
+    userId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<Task[]> {
+    const tasks = await Tasks.find({
+      createdAt: { $gte: startDate, $lte: endDate }
+    } as any)
+      .populate({
+        path: 'technical',
+        select: '-password',
+        populate: {
+          path: 'coordinator',
+          select: '-password',
+          match: { _id: userId }
+        }
+      })
+      .populate('place');
+
+    const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
+    return filteredTasks;
+  }
+
   private async groupByUser(match?: {
     [key: string]: string | number | Types.ObjectId;
   }): Promise<User[]> {

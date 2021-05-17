@@ -17,12 +17,12 @@ const schema = new Schema(
       required: true
     },
     scheduledDate: { type: Date, required: true },
-    arrivalDate: { type: Date, required: true },
+    arrivalDate: { type: Date },
     arrivalLatLong: pointSchema,
-    arrivalPhoto: { type: String, required: true },
-    closedDate: { type: Date, required: true },
+    arrivalPhoto: { type: String },
+    closedDate: { type: Date },
     closedLatLong: pointSchema,
-    closedPhoto: { type: String, required: true },
+    closedPhoto: { type: String },
     type: {
       type: String,
       enum: TASK_TYPE_LIST,

@@ -8,8 +8,16 @@ export default () => {
   const controller = new TasksController();
 
   router.post('/create', controller.create); // put middleware.verifyToken
+
   router.delete('/:id', middleware.verifyToken, controller.delete);
+
   router.get('/', controller.getAll); // middleware.verifyToken
   router.get('/getGroupByUser', controller.getGroupByUser);
+  router.get('/user/:userId', controller.getAllByIdUser);
+  router.get(
+    '/user/:userId/range/:startDate/:endDate',
+    controller.getAllByIdUserAndRangeDates
+  );
+
   return router;
 };

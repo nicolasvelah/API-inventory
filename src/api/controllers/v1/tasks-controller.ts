@@ -63,10 +63,11 @@ export default class TasksController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const resp = await this.tasksRepo.getGroupByUser();
-      console.log('resp -->', resp[0]);
+      /*const resp = await this.tasksRepo.getGroupByUser();
+      console.log('resp -->', resp[0]); */
       const tasks = await this.tasksRepo.getAll();
-      res.send(tasks);
+      console.log('tasks -->', tasks);
+      res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -76,6 +77,28 @@ export default class TasksController {
     try {
       const users = await this.tasksRepo.getGroupByUser();
       res.send(users);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getAllByIdUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      console.log('userId -->', userId);
+      const tasks = await this.tasksRepo.getAllByIdUser(userId);
+      res.send({ tasks });
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async getAllByIdUserAndRangeDates(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId, startDate, endDate } = req.params;
+      console.log('params -->', { userId, startDate, endDate });
+      const tasks = await this.tasksRepo.getAllByIdUserAndRangeDates(userId, startDate, endDate);
+      res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);
     }

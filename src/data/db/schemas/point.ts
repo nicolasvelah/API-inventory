@@ -9,7 +9,7 @@ const pointSchema = new Schema({
   coordinates: {
     type: [Number],
     required: true
-  }
+  },
 });
 
 export default pointSchema;
