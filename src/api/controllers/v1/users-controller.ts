@@ -28,9 +28,11 @@ export default class UsersController {
       }
 
       const user = await this.usersRepo.findByEmail(email);
+      // console.log('user -->', user);
       if (!user) throw { code: 400, message: 'User do not exist' };
 
       const correctPassword = await Crypt.matchPassword(password, user.password ?? '');
+      // console.log('correctPassword -->', correctPassword);
       if (!correctPassword) throw { code: 401, message: 'Unauthorized' };
 
       const token = await this.firebaseRepo.createFirebaseToken(user.id);
@@ -49,6 +51,7 @@ export default class UsersController {
       };
       res.send({ user: userWithoutPassword, token });
     } catch (error) {
+      console.error('❌ ❌Error en login:', error.message);
       res.status(401).send({ message: 'Unauthorized' });
     }
   }
