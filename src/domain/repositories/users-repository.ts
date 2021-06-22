@@ -12,4 +12,5 @@ export default interface UsersRepository {
   updatePasswordByEmail(email: string, password: string): Promise<User | null>;
   getById(id: string): Promise<User | null>;
   findByValue(value: string): Promise<User[]>;
+  getCoordinatorsAndTechnicals(): Promise<User[]>;
 }

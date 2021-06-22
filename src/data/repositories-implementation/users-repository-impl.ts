@@ -62,6 +62,14 @@ export default class UsersRepositoryImpl implements UsersRepository {
     return Users.findById({ _id: id });
   }
 
+  async getCoordinatorsAndTechnicals(): Promise<User[]> {
+    const users = await Users.find({
+      $or: [{ role: 'administrator' }, { role: 'technical' }]
+    });
+    console.log('users -->', users);
+    return users;
+  }
+
   private rgx(pattern: string): RegExp {
     return new RegExp(`.*${pattern}.*`);
   }

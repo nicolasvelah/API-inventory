@@ -219,6 +219,17 @@ export default class UsersController {
     }
   }
 
+  async getCoordinatorsAndTechnicals(req: Request, res: Response) {
+    try {
+      console.log('ENTRO');
+      const users = await this.usersRepo.getCoordinatorsAndTechnicals();
+      console.log('users controller -->', users);
+      res.send({ users });
+    } catch (error) {
+      sendErrorResponse(error, res);
+    }
+  }
+
   private async sendEmailToResetPassword(email: string) {
     const expiresIn = 60 * 30; // 30 mins in seconds
     const token = jwt.sign({ email, public: true }, process.env.JWT_SECRET!, { expiresIn });
