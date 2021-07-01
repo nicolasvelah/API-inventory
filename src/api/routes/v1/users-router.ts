@@ -28,7 +28,7 @@ export default () => {
 
   //Get users
   router.get('/', controller.getAll); // put middleware.verifyToken
-  router.get('/:value', controller.findByValue); // put middleware.verifyToken
+  router.get('/search', controller.findByValue); // put middleware.verifyToken
   router.get('/id/:id', controller.getById); // put middleware.verifyToken
   router.get('/coordinators-technicals', controller.getCoordinatorsAndTechnicals); // put middleware.verifyToken
 

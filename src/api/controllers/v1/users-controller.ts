@@ -198,9 +198,8 @@ export default class UsersController {
 
   async findByValue(req: Request, res: Response) {
     try {
-      console.log('findByValue');
-      const { value } = req.params;
-      const users = await this.usersRepo.findByValue(value);
+      const { value } = req.query;
+      const users = await this.usersRepo.findByValue(value as string);
       res.send({ users });
     } catch (error) {
       sendErrorResponse(error, res);
