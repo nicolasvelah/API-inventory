@@ -54,9 +54,16 @@ export default class ValidateUser {
   static updateValidation() {
     const validationParams: schema = {
       body: Joi.object({
-        phone: Joi.string().regex(/[0-9]{7,30}/),
-        role: Joi.string(),
-        enabled: Joi.boolean()
+        name: Joi.string().allow(null),
+        lastName: Joi.string().allow(null),
+        dateOfBirth: Joi.string().allow(null),
+        email: Joi.string().email().allow(null),
+        phone: Joi.string()
+          .regex(/[0-9]{7,30}/)
+          .allow(null),
+        role: Joi.string().allow(null),
+        enabled: Joi.boolean().allow(null),
+        idCoordinator: Joi.string().allow(null)
       })
     };
     return validate(validationParams);

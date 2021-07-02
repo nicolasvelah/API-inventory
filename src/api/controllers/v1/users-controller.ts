@@ -10,6 +10,7 @@ import PERMISSIONS_USERS from '../../../helpers/permissions-user';
 import Crypt from '../../../helpers/crypt';
 import EmailManager from '../../../helpers/email-manager';
 import User, { userRolesType } from '../../../domain/models/user';
+import { UpdateUser } from '../../../domain/models/generic/controllers/user-controller-inputs';
 
 export default class UsersController {
   private usersRepo = Get.find<UsersRepository>(Dependencies.users);
@@ -169,28 +170,18 @@ export default class UsersController {
 
   async update(req: Request, res: Response) {
     try {
-      const {
-        phone,
-        role,
-        enabled
-      }: { phone?: string; role?: userRolesType; enabled?: boolean } = req.body;
+      const data = req.body as UpdateUser;
+      const { id } = req.params;
 
-      const { id }: { id: string } = (req as any).session;
-
-      if (role) {
-        const validateRol = Object.keys(PERMISSIONS_USERS).includes(role ?? '');
+      if (data.role) {
+        const validateRol = Object.keys(PERMISSIONS_USERS).includes(data.role ?? '');
         if (!validateRol) throw { code: 417, message: 'Invalid role' };
       }
 
-      const user = await this.usersRepo.getById(id);
-      if (!user) throw { code: 400, message: 'User not foud' };
+      const userUpdated = await this.usersRepo.update(id, req.body);
+      if (!userUpdated) throw { code: 400, message: 'Error to update' };
 
-      user.phone = phone ?? user.phone;
-      user.role = role ?? user.role;
-      user.enabled = enabled === undefined ? user.enabled : enabled;
-      await user.save();
-
-      res.send({ message: 'User updated' });
+      res.send({ user: userUpdated });
     } catch (error) {
       sendErrorResponse(error, res);
     }
@@ -235,12 +226,14 @@ export default class UsersController {
     console.log('token -->', token);
 
     const emailManager = EmailManager.getInstance();
+
+    const URI = `http://localhost:3000/reset/${token}`;
     await emailManager.sendEmail({
       to: email,
       //to: 'bjuanacio@pas-hq.com',
       html: `<div>
           Hola
-          <a href="http://localhost:3000/reset/${token}" target="_blank">
+          <a href="${URI}" target="_blank">
             ir a link
           </a>
           </div>`,
