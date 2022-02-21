@@ -1,10 +1,10 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
 import { DocumentDefinition } from 'mongoose';
-import Catalogue from '../models/catalogue';
+import Catalog from '../models/catalog';
 
 export default interface CatalogsRepository {
-  create(data: DocumentDefinition<Catalogue>): Promise<Catalogue>;
+  create(data: DocumentDefinition<Catalog>): Promise<Catalog>;
   deleteById(id: string): Promise<boolean>;
-  getAll(): Promise<Catalogue[]>;
+  getAll(): Promise<Catalog[]>;
 }

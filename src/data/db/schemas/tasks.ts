@@ -23,6 +23,8 @@ const schema = new Schema(
     closedDate: { type: Date },
     closedLatLong: pointSchema,
     closedPhoto: { type: String },
+    certificatePhoto: { type: String },
+    emnployeePhoto: { type: String },
     type: {
       type: String,
       enum: TASK_TYPE_LIST,

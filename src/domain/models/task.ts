@@ -24,6 +24,8 @@ export default interface Task extends Document {
   closedDate?: Date;
   closedLatLong?: Point;
   closedPhoto?: string;
+  certificatePhoto?: string;
+  emnployeePhoto?: string;
   type: taskType;
   createdAt?: Date;
   updatedAt?: Date;

@@ -9,31 +9,36 @@ const defaultInventoryState: inventoryStateType = 'installed';
 const schema = new Schema(
   {
     device: {
-      ref: 'catalogue',
+      ref: 'catalog',
       type: Schema.Types.ObjectId,
       required: true
     },
     place: {
       ref: 'place',
       type: Schema.Types.ObjectId,
-      required: true
+      required: false
     },
     user: {
       ref: 'user',
       type: Schema.Types.ObjectId,
-      required: true
+      required: false
     },
     task: {
       ref: 'task',
       type: Schema.Types.ObjectId,
-      required: true
+      required: false
     },
     state: {
       type: String,
       enum: INVENTORY_STATE_TYPE_LIST,
       default: defaultInventoryState
     },
-    dataCollected: { type: Object, required: true }
+    installationDate: { type: Date, required: false },
+    spentMaterial: { type: Number, required: false },
+    remainingMaterial: { type: Number, required: false },
+    totalMaterial: { type: Number, required: false },
+    photos: { type: JSON, required: false },
+    dataCollected: { type: JSON, required: false },
   },
   { timestamps: true }
 );

@@ -15,8 +15,7 @@ export default class EmailManager {
   constructor() {
     const PORT = 465;
     const options = {
-      //host: process.env.SMTP_URL,
-      host: 'smtp.gmail.com', // For tests
+      host: process.env.SMTP_URL,
       port: PORT,
       secure: PORT === 465, // true for 465, false for other ports
       auth: {

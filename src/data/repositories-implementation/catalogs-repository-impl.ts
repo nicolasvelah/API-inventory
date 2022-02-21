@@ -1,10 +1,10 @@
 import { DocumentDefinition } from 'mongoose';
 import CatalogsRepository from '../../domain/repositories/catalogs-repository';
-import Catalogue from '../../domain/models/catalogue';
-import Catalogs from '../db/schemas/catalogs';
+import Catalog from '../../domain/models/catalog';
+import Catalogs from '../db/schemas/catalog';
 
 export default class CatalogsRepositoryImpl implements CatalogsRepository {
-  create(data: DocumentDefinition<Catalogue>): Promise<Catalogue> {
+  create(data: DocumentDefinition<Catalog>): Promise<Catalog> {
     return Catalogs.create(data);
   }
 
@@ -13,7 +13,7 @@ export default class CatalogsRepositoryImpl implements CatalogsRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAll(): Promise<Catalogue[]> {
+  async getAll(): Promise<Catalog[]> {
     const places = await Catalogs.find({});
     return places;
   }
