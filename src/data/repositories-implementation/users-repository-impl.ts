@@ -77,10 +77,10 @@ export default class UsersRepositoryImpl implements UsersRepository {
     if (!user) return null;
 
     user.name = data.name ?? user.name;
-    user.lastName = data.lastName ?? user.name;
+    user.lastName = data.lastName ?? user.lastName;
     user.dateOfBirth = data.dateOfBirth ? new Date(data.dateOfBirth) : user.dateOfBirth;
-    user.email = data.email ?? user.name;
-    user.phone = data.phone ?? user.name;
+    user.email = data.email ?? user.email;
+    user.phone = data.phone ?? user.phone;
     user.role = data.role ? (data.role as userRolesType) : user.role;
     user.coordinator = data.idCoordinator
       ? ((data.idCoordinator as unknown) as User | undefined)

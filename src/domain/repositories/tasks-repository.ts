@@ -3,6 +3,7 @@
 import { DocumentDefinition, Types } from 'mongoose';
 import Task from '../models/task';
 import User from '../models/user';
+import { UpdateTask } from '../models/generic/controllers/task-cotroller-inputs';
 
 export interface TasksByUser {
   _id: Types.ObjectId;
@@ -17,4 +18,5 @@ export default interface TasksRepository {
   getAll(): Promise<Task[]>;
   getAllByIdUser(userId: string): Promise<Task[]>;
   getAllByIdUserAndRangeDates(userId: string, startDate: string, endDate: string): Promise<Task[]>;
+  update(id: string, data: UpdateTask): Promise<Task | null>;
 }

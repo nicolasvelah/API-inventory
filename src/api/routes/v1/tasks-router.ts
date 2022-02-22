@@ -8,6 +8,7 @@ export default () => {
   const controller = new TasksController();
 
   router.post('/create', controller.create); // put middleware.verifyToken
+  router.post('/update/:id', controller.update);
 
   router.delete('/:id', middleware.verifyToken, controller.delete);
 

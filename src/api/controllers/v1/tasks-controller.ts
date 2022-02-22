@@ -27,7 +27,38 @@ export default class TasksController {
         technical: idTechnical,
         coordinator: idCoordinator,
         place: idPlace,
-        /*arrivalDate: new Date(arrivalDate),
+        scheduledDate: new Date(scheduledDate),
+        type,
+        description
+      });
+      res.send(task);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+      const {
+        idTechnical,
+        idCoordinator,
+        idPlace,
+        scheduledDate,
+        arrivalDate,
+        arrivalLatLong,
+        arrivalPhoto,
+        closedDate,
+        closedLatLong,
+        closedPhoto,
+        type,
+        description,
+      } = req.body;
+
+      const data = {
+        technical: idTechnical,
+        coordinator: idCoordinator,
+        place: idPlace,
+        arrivalDate: new Date(arrivalDate),
         arrivalLatLong: {
           type: 'Point',
           coordinates: arrivalLatLong
@@ -38,11 +69,13 @@ export default class TasksController {
           type: 'Point',
           coordinates: closedLatLong
         },
-        closedPhoto,*/
+        closedPhoto,
         scheduledDate: new Date(scheduledDate),
         type,
         description
-      });
+      }
+
+      const task = await this.tasksRepo.update('621449bec341eaa648916b19', data);
       res.send(task);
     } catch (e) {
       sendErrorResponse(e, res);
