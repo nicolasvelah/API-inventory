@@ -18,7 +18,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
   }
 
   async getAll(): Promise<Task[]> {
-    const tasks = await Tasks.find({}).populate('technical', '-password').populate('place');
+    const tasks = await Tasks.find({}).populate('technical', '-password').populate('coordinator', '-password').populate('place');
     return tasks;
   }
 
@@ -43,10 +43,10 @@ export default class TasksRepositoryImpl implements TasksRepository {
           match: { _id: userId }
         }
       })
+      .populate('coordinator')
       .populate('place');
-
-    const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
-    return filteredTasks;
+    //const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
+    return tasks;
   }
 
   async getAllByIdUserAndRangeDates(

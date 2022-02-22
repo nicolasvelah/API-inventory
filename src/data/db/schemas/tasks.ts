@@ -11,6 +11,11 @@ const schema = new Schema(
       type: Schema.Types.ObjectId,
       required: true
     },
+    coordinator: {
+      ref: 'user',
+      type: Schema.Types.ObjectId,
+      required: true
+    },
     place: {
       ref: 'place',
       type: Schema.Types.ObjectId,
@@ -29,7 +34,8 @@ const schema = new Schema(
       type: String,
       enum: TASK_TYPE_LIST,
       default: defaultType
-    }
+    },
+    description: { type: String }
   },
   { timestamps: true }
 );

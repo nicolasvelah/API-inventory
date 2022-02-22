@@ -14,14 +14,15 @@ export default class CatalogsController {
 
   async create(req: Request, res: Response) {
     try {
-      const { brand, dataToCollectInterface, device, referenceModel, typePlace } = req.body;
+      const { brand, dataToCollectInterface, device, referenceModel, typePlace, unitOfMeasurement } = req.body;
 
       const inventory = await this.catalogsRepo.create({
         brand,
         dataToCollectInterface,
         device,
         referenceModel,
-        typePlace
+        typePlace,
+        unitOfMeasurement
       });
 
       res.send(inventory);

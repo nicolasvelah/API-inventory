@@ -16,6 +16,7 @@ export const TASK_TYPE_LIST = Object.keys(TaskType);
 
 export default interface Task extends Document {
   technical: User;
+  coordinator: User;
   place: Place;
   scheduledDate: Date;
   arrivalDate?: Date;
@@ -27,6 +28,7 @@ export default interface Task extends Document {
   certificatePhoto?: string;
   emnployeePhoto?: string;
   type: taskType;
+  description: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -16,21 +16,18 @@ export default class TasksController {
     try {
       const {
         idTechnical,
+        idCoordinator,
         idPlace,
-        arrivalDate,
-        arrivalLatLong,
-        arrivalPhoto,
-        closedDate,
-        closedLatLong,
-        closedPhoto,
         scheduledDate,
-        type
-      } = req.body;
+        type,
+        description,
+      } = req.body; // como se relaciona con el inventario
 
       const task = await this.tasksRepo.create({
         technical: idTechnical,
+        coordinator: idCoordinator,
         place: idPlace,
-        arrivalDate: new Date(arrivalDate),
+        /*arrivalDate: new Date(arrivalDate),
         arrivalLatLong: {
           type: 'Point',
           coordinates: arrivalLatLong
@@ -41,9 +38,10 @@ export default class TasksController {
           type: 'Point',
           coordinates: closedLatLong
         },
-        closedPhoto,
+        closedPhoto,*/
         scheduledDate: new Date(scheduledDate),
-        type
+        type,
+        description
       });
       res.send(task);
     } catch (e) {

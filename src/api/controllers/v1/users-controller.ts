@@ -83,10 +83,8 @@ export default class UsersController {
       if (userFoud) {
         throw { code: 400, message: 'The Email is already in use' };
       }
-
       const validateRol = Object.keys(PERMISSIONS_USERS).includes(role);
       if (!validateRol) throw { code: 417, message: 'Invalid role' };
-
       const permissions = PERMISSIONS_USERS[role];
       const user = await this.usersRepo.create({
         name,
@@ -99,7 +97,6 @@ export default class UsersController {
         enabled,
         coordinator: idCoordinator as User | undefined // Esto se le hace para poder hacer la relación en mongodb
       });
-
       if (!user) throw { code: 500, message: 'Interval server error' };
 
       await this.sendEmailToResetPassword(user.email);

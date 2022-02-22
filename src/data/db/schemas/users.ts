@@ -9,7 +9,7 @@ const schema = new Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
     password: { type: String },
-    permissions: { type: [String], required: true },
+    permissions: { type: [String], required: false },
     role: {
       type: String,
       enum: USER_ROLES_LIST,
