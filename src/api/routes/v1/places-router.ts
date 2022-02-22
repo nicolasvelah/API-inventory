@@ -7,7 +7,7 @@ export default () => {
   const middleware = Middleware.getInstance();
   const controller = new PlacesController();
 
-  router.post('/create', controller.create); // put middleware.verifyToken
-  router.get('/', middleware.verifyToken, controller.getAll);
+  router.post('/create', middleware.verifyToken, controller.create);
+  router.get('/', controller.getAll); // put middleware.verifyToken
   return router;
 };
