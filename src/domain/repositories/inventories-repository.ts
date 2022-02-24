@@ -7,4 +7,5 @@ export default interface InventoriesRepository {
   create(data: DocumentDefinition<Inventory>): Promise<Inventory>;
   deleteById(id: string): Promise<boolean>;
   getAll(): Promise<Inventory[]>;
+  getBy(id: string, type: string): Promise<Inventory[]>;
 }

@@ -75,7 +75,7 @@ export default class TasksController {
         description
       }
 
-      const task = await this.tasksRepo.update('621449bec341eaa648916b19', data);
+      const task = await this.tasksRepo.update(req.params.id, data);
       res.send(task);
     } catch (e) {
       sendErrorResponse(e, res);

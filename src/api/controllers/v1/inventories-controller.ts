@@ -58,6 +58,15 @@ export default class InventoriesController {
     }
   }
 
+  async getBy(req: Request, res: Response): Promise<void> {
+    try {
+      const inventories = await this.inventoriesRepo.getBy(req.params.id, req.params.type);
+      res.send(inventories);
+    } catch (e) {
+      sendErrorResponse(e, res);
+    }
+  }
+
   async addMaterialToInventory(req: Request, res: Response): Promise<string | undefined> {
     if (!req.file) {
       res.status(406).send({ message: 'No file attached' });

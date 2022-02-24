@@ -34,20 +34,42 @@ export default class TasksRepositoryImpl implements TasksRepository {
   }
 
   async getAllByIdUser(userId: string): Promise<Task[]> {
-    const tasks = await Tasks.find({})
-      .populate({
-        path: 'technical',
-        select: '-password',
-        populate: {
-          path: 'coordinator',
-          select: '-password',
-          match: { _id: userId }
+    const task = await Tasks.aggregate([
+      // join users for technical
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'technical',
+          foreignField: '_id',
+          as: 'technical'
         }
-      })
-      .populate('coordinator')
-      .populate('place');
-    //const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
-    return tasks;
+      },
+      {
+        $unwind: '$technical'
+      },
+      // filtramos solo los de la variable userId
+      { $match: { 'technical._id': Types.ObjectId(userId) } },
+      // join users for coordinator
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'coordinator',
+          foreignField: '_id',
+          as: 'coordinator'
+        }
+      },
+      // join place
+      {
+        $lookup: {
+          from: 'places',
+          localField: 'place',
+          foreignField: '_id',
+          as: 'place'
+        }
+      }
+    ])
+
+    return task;
   }
 
   async getAllByIdUserAndRangeDates(
