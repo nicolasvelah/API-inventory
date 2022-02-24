@@ -7,9 +7,10 @@ class _Get {
 
   find<T>(key: string) {
     if (!this.data.has(key)) {
-      return null;
+      const { stack } = new Error();
+      console.info(`Dependency ${key} not found, make sure call Get.put before`, stack);
     }
-    return this.data.get(key);
+    return this.data.get(key) as T;
   }
 }
 
