@@ -3,7 +3,7 @@ import Task from '../../domain/models/task';
 import TasksRepository from '../../domain/repositories/tasks-repository';
 import Tasks from '../db/schemas/tasks';
 import User from '../../domain/models/user';
-import UpdateTask from '../../domain/models/generic/controllers/task-cotroller-inputs'
+import { UpdateTask } from '../../domain/models/generic/controllers/task-cotroller-inputs'
 
 export default class TasksRepositoryImpl implements TasksRepository {
   async getGroupByUserAndUserId(userId: string): Promise<User[]> {
