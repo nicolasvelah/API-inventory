@@ -54,7 +54,7 @@ export default class TasksController {
         description,
       } = req.body;
 
-      const data = {
+      const data:any = {
         technical: idTechnical,
         coordinator: idCoordinator,
         place: idPlace,
