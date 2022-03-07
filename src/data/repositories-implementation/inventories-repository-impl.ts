@@ -102,7 +102,8 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
         $unwind: '$task'
       },
       // filtramos solo los de la variable userId
-      { $match: { 'task._id': OId } }
+      { $match: { 'task._id': OId } },
+      { $unset: 'task' }
     ])
     return material;
   }

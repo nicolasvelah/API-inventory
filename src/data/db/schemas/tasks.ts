@@ -25,7 +25,7 @@ const schema = new Schema(
     arrivalDate: { type: Date },
     arrivalLatLong: pointSchema,
     arrivalPhoto: { type: String },
-    closedDate: { type: Date },
+    closedDate: { type: Date, required: false },
     closedLatLong: pointSchema,
     closedPhoto: { type: String },
     certificatePhoto: { type: String },

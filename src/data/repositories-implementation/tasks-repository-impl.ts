@@ -33,7 +33,13 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAllByIdUser(userId: string): Promise<Task[]> {
+  async getAllByIdUser(userId: string, status:string): Promise<Task[]> {
+    const query:any = { 'technical._id': Types.ObjectId(userId) };
+    if (status === 'closed') {
+      query.closedDate = { $ne: null };
+    } else {
+      query.closedDate = null;
+    }
     const task = await Tasks.aggregate([
       // join users for technical
       {
@@ -50,7 +56,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
       },
       // filtramos solo los de la variable userId
       {
-        $match: { 'technical._id': Types.ObjectId(userId) }
+        $match: query
       },
       // join users for coordinator
       {

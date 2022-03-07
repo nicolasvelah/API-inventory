@@ -61,19 +61,19 @@ export default class TasksController {
         technical: idTechnical,
         coordinator: idCoordinator,
         place: idPlace,
-        arrivalDate: new Date(arrivalDate),
+        arrivalDate: arrivalDate ? new Date(arrivalDate) : null,
         arrivalLatLong: {
           type: 'Point',
           coordinates: arrivalLatLong
         },
         arrivalPhoto,
-        closedDate: new Date(closedDate),
+        closedDate: closedDate ? new Date(closedDate) : null,
         closedLatLong: {
           type: 'Point',
           coordinates: closedLatLong
         },
-        closedPhoto,
-        scheduledDate: new Date(scheduledDate),
+        closedPhoto: closedPhoto ?? null,
+        scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
         type,
         description
       }
@@ -118,13 +118,12 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { userId } = req.params;
-      console.log('userId -->', userId);
-      const tasks = await this.tasksRepo.getAllByIdUser(userId);
+      const { userId, status } = req.params;
+      const tasks = await this.tasksRepo.getAllByIdUser(userId, status);
       for (let i = 0; i < tasks.length; i++) {
         const currTask = tasks[i]
-        const inventory = await this.inventoryRepo.getTaskInventory(currTask._id);
-        console.log('inventory', inventory);
+        // eslint-disable-next-line no-await-in-loop
+        const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
         tasks[i].inventory = inventory;
       }
       res.send({ tasks });
