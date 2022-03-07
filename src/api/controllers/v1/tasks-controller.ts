@@ -118,7 +118,8 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { userId, status } = req.params;
+      const { status } = req.params;
+      const { userId } = res.locals.session;
       const tasks = await this.tasksRepo.getAllByIdUser(userId, status);
       for (let i = 0; i < tasks.length; i++) {
         const currTask = tasks[i]

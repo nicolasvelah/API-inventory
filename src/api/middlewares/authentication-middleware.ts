@@ -46,7 +46,7 @@ export default class Middleware {
       const idUser = await firebaseRepo.verifyFirebaseToken(token);
       if (!idUser) throw { code: 401, message: 'Unauthorized' };
       /// Esto se lo hace para tener el id del usuario en el request ya que typescript me lo percibe como un error
-      (req as any).session = { idUser };
+      res.locals.session = { idUser };
 
       next();
     } catch (e) {
