@@ -41,6 +41,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
           from: 'users',
           localField: 'technical',
           foreignField: '_id',
+          pipeline: [{ $project: { password: 0 } }],
           as: 'technical'
         }
       },
@@ -48,13 +49,16 @@ export default class TasksRepositoryImpl implements TasksRepository {
         $unwind: '$technical'
       },
       // filtramos solo los de la variable userId
-      { $match: { 'technical._id': Types.ObjectId(userId) } },
+      {
+        $match: { 'technical._id': Types.ObjectId(userId) }
+      },
       // join users for coordinator
       {
         $lookup: {
           from: 'users',
           localField: 'coordinator',
           foreignField: '_id',
+          pipeline: [{ $project: { password: 0 } }],
           as: 'coordinator'
         }
       },

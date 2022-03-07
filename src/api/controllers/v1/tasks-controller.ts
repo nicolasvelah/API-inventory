@@ -2,11 +2,14 @@ import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
 import TasksRepository from '../../../domain/repositories/tasks-repository';
+import InventoriesRepository from '../../../domain/repositories/inventories-repository';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
 export default class TasksController {
   private tasksRepo = Get.find<TasksRepository>(Dependencies.tasks);
+
+  private inventoryRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   constructor() {
     autoBind(this);
@@ -118,6 +121,12 @@ export default class TasksController {
       const { userId } = req.params;
       console.log('userId -->', userId);
       const tasks = await this.tasksRepo.getAllByIdUser(userId);
+      for (let i = 0; i < tasks.length; i++) {
+        const currTask = tasks[i]
+        const inventory = await this.inventoryRepo.getTaskInventory(currTask._id);
+        console.log('inventory', inventory);
+        tasks[i].inventory = inventory;
+      }
       res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);
