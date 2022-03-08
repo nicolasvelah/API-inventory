@@ -128,7 +128,7 @@ export default class TasksController {
         const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
         tasks[0].paginatedResults[i].inventory = inventory;
       }
-      res.send({ tasks });
+      res.send(tasks[0]);
     } catch (e) {
       sendErrorResponse(e, res);
     }
