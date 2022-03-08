@@ -3,7 +3,7 @@ import Place from '../../place';
 import Point from '../../point';
 import { taskType } from '../../task'
 
-export default interface UpdateTask {
+export interface UpdateTask {
   technical?: User;
   coordinator?: User;
   place?: Place;

@@ -29,6 +29,7 @@ export default interface Task extends Document {
   emnployeePhoto?: string;
   type: taskType;
   description: string;
+  inventory?: any;
   createdAt?: Date;
   updatedAt?: Date;
 }

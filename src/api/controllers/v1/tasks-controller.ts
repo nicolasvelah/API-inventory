@@ -2,11 +2,14 @@ import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
 import TasksRepository from '../../../domain/repositories/tasks-repository';
+import InventoriesRepository from '../../../domain/repositories/inventories-repository';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 
 export default class TasksController {
   private tasksRepo = Get.find<TasksRepository>(Dependencies.tasks);
+
+  private inventoryRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   constructor() {
     autoBind(this);
@@ -54,28 +57,28 @@ export default class TasksController {
         description,
       } = req.body;
 
-      const data = {
+      const data:any = {
         technical: idTechnical,
         coordinator: idCoordinator,
         place: idPlace,
-        arrivalDate: new Date(arrivalDate),
+        arrivalDate: arrivalDate ? new Date(arrivalDate) : null,
         arrivalLatLong: {
           type: 'Point',
           coordinates: arrivalLatLong
         },
         arrivalPhoto,
-        closedDate: new Date(closedDate),
+        closedDate: closedDate ? new Date(closedDate) : null,
         closedLatLong: {
           type: 'Point',
           coordinates: closedLatLong
         },
-        closedPhoto,
-        scheduledDate: new Date(scheduledDate),
+        closedPhoto: closedPhoto ?? null,
+        scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
         type,
         description
       }
 
-      const task = await this.tasksRepo.update('621449bec341eaa648916b19', data);
+      const task = await this.tasksRepo.update(req.params.id, data);
       res.send(task);
     } catch (e) {
       sendErrorResponse(e, res);
@@ -115,9 +118,18 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { userId } = req.params;
-      console.log('userId -->', userId);
-      const tasks = await this.tasksRepo.getAllByIdUser(userId);
+      const { status } = req.params;
+      const { userId } = res.locals.session;
+      const { limit, page } = req.query;
+      console.log('limit', limit);
+      console.log('page', page);
+      const tasks = await this.tasksRepo.getAllByIdUser(userId, status, Number(page), Number(limit));
+      for (let i = 0; i < tasks.length; i++) {
+        const currTask = tasks[i]
+        // eslint-disable-next-line no-await-in-loop
+        const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
+        tasks[i].inventory = inventory;
+      }
       res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);

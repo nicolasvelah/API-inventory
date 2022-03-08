@@ -3,7 +3,7 @@ import Task from '../../domain/models/task';
 import TasksRepository from '../../domain/repositories/tasks-repository';
 import Tasks from '../db/schemas/tasks';
 import User from '../../domain/models/user';
-import UpdateTask from '../../domain/models/generic/controllers/task-cotroller-inputs'
+import { UpdateTask } from '../../domain/models/generic/controllers/task-cotroller-inputs'
 
 export default class TasksRepositoryImpl implements TasksRepository {
   async getGroupByUserAndUserId(userId: string): Promise<User[]> {
@@ -33,21 +33,63 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAllByIdUser(userId: string): Promise<Task[]> {
-    const tasks = await Tasks.find({})
-      .populate({
-        path: 'technical',
-        select: '-password',
-        populate: {
-          path: 'coordinator',
-          select: '-password',
-          match: { _id: userId }
+  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<Task[]> {
+    const query:any = { 'technical._id': Types.ObjectId(userId) };
+    if (status === 'closed') {
+      query.closedDate = { $ne: null };
+    } else {
+      query.closedDate = null;
+    }
+    const task = await Tasks.aggregate([
+      // join users for technical
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'technical',
+          foreignField: '_id',
+          pipeline: [{ $project: { password: 0 } }],
+          as: 'technical'
         }
-      })
-      .populate('coordinator')
-      .populate('place');
-    //const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
-    return tasks;
+      },
+      {
+        $unwind: '$technical'
+      },
+      // filtramos solo los de la variable userId
+      {
+        $match: query
+      },
+      // join users for coordinator
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'coordinator',
+          foreignField: '_id',
+          pipeline: [{ $project: { password: 0 } }],
+          as: 'coordinator'
+        }
+      },
+      // join place
+      {
+        $lookup: {
+          from: 'places',
+          localField: 'place',
+          foreignField: '_id',
+          as: 'place'
+        }
+      },
+      {
+        $facet: {
+          paginatedResults: [{ $skip: (limit * page) }, { $limit: limit }],
+          totalCount: [
+            {
+              $count: 'count'
+            }
+          ]
+        }
+      }
+    ])
+
+    return task;
   }
 
   async getAllByIdUserAndRangeDates(
@@ -115,7 +157,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
         return user;
       });
       return orderData;
-    } catch (error) {
+    } catch (error:any) {
       console.log('Error en groupByUser:', error.message);
       return [];
     }
