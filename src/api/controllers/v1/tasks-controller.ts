@@ -118,9 +118,12 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { status } = req.params;
-      const { userId } = res.locals.session;
-      const tasks = await this.tasksRepo.getAllByIdUser(userId, status);
+      const { status, userId } = req.params;
+      //const { userId } = res.locals.session;
+      const { limit, page } = req.query;
+      console.log('limit', limit);
+      console.log('page', page);
+      const tasks = await this.tasksRepo.getAllByIdUser(userId, status, Number(page), Number(limit));
       for (let i = 0; i < tasks.length; i++) {
         const currTask = tasks[i]
         // eslint-disable-next-line no-await-in-loop

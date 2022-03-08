@@ -33,7 +33,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAllByIdUser(userId: string, status:string): Promise<Task[]> {
+  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<Task[]> {
     const query:any = { 'technical._id': Types.ObjectId(userId) };
     if (status === 'closed') {
       query.closedDate = { $ne: null };
@@ -75,6 +75,16 @@ export default class TasksRepositoryImpl implements TasksRepository {
           localField: 'place',
           foreignField: '_id',
           as: 'place'
+        }
+      },
+      {
+        $facet: {
+          paginatedResults: [{ $skip: (limit * page) }, { $limit: limit }],
+          totalCount: [
+            {
+              $count: 'count'
+            }
+          ]
         }
       }
     ])
@@ -147,7 +157,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
         return user;
       });
       return orderData;
-    } catch (error) {
+    } catch (error:any) {
       console.log('Error en groupByUser:', error.message);
       return [];
     }
