@@ -36,7 +36,7 @@ export default interface Task extends Document {
 
 export interface taskResponse {
   total: number;
-  task: Task[] | null;
+  task: any | null;
   itemsPerPage: number;
   pages: number;
 }

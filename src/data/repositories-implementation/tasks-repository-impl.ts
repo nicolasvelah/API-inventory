@@ -44,7 +44,8 @@ export default class TasksRepositoryImpl implements TasksRepository {
         .populate('coordinator', '-password')
         .populate('place')
         .skip(limit * page)
-        .limit(limit);
+        .limit(limit)
+        .lean();
       return { total: count, task, itemsPerPage: limit, pages };
     }
     return { total: count, task: null, itemsPerPage: limit, pages };
