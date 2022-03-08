@@ -1,7 +1,7 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
 import { DocumentDefinition, Types } from 'mongoose';
-import Task from '../models/task';
+import Task, { taskResponse } from '../models/task';
 import User from '../models/user';
 import { UpdateTask } from '../models/generic/controllers/task-cotroller-inputs';
 
@@ -16,7 +16,7 @@ export default interface TasksRepository {
   create(data: DocumentDefinition<Task>): Promise<Task>;
   deleteById(id: string): Promise<boolean>;
   getAll(): Promise<Task[]>;
-  getAllByIdUser(userId: string, status: string, page:number, limit:number): Promise<Task[]>;
+  getAllByIdUser(userId: string, status: string, page:number, limit:number): Promise<taskResponse>;
   getAllByIdUserAndRangeDates(userId: string, startDate: string, endDate: string): Promise<Task[]>;
   update(id: string, data: UpdateTask): Promise<Task | null>;
 }

@@ -122,13 +122,13 @@ export default class TasksController {
       const { idUser } = res.locals.session;
       const { limit, page } = req.query;
       const tasks:any = await this.tasksRepo.getAllByIdUser(idUser, status, Number(page), Number(limit));
-      for (let i = 0; i < tasks[0].paginatedResults.length; i++) {
-        const currTask = tasks[0].paginatedResults[i]
+      for (let i = 0; i < tasks.task.length; i++) {
+        const currTask = tasks.task[i]
         // eslint-disable-next-line no-await-in-loop
         const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
-        tasks[0].paginatedResults[i].inventory = inventory;
+        tasks.task[i].inventory = inventory;
       }
-      res.send(tasks[0]);
+      res.send(tasks);
     } catch (e) {
       sendErrorResponse(e, res);
     }

@@ -87,24 +87,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
   }
 
   async getTaskInventory(id: string): Promise<Inventory[]> {
-    const OId = Types.ObjectId(id);
-    const material = await Inventories.aggregate([
-      // join tasks
-      {
-        $lookup: {
-          from: 'tasks',
-          localField: 'task',
-          foreignField: '_id',
-          as: 'task'
-        }
-      },
-      {
-        $unwind: '$task'
-      },
-      // filtramos solo los de la variable userId
-      { $match: { 'task._id': OId } },
-      { $unset: 'task' }
-    ])
+    const material = await Inventories.find({ task: id });
     return material;
   }
 }

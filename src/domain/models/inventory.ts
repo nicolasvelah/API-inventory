@@ -22,10 +22,10 @@ export interface Photos {
 }
 
 export default interface Inventory extends Document {
-  device: Catalog;
-  place?: Place;
-  user?: User;
-  task?: Task;
+  device: Catalog | string;
+  place?: Place | string;
+  user?: User | string;
+  task?: Task | string;
   state: inventoryStateType;
   installationDate?: Date;
   spentMaterial?: number;

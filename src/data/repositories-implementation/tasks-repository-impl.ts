@@ -1,5 +1,5 @@
 import { DocumentDefinition, Types } from 'mongoose';
-import Task from '../../domain/models/task';
+import Task, { taskResponse } from '../../domain/models/task';
 import TasksRepository from '../../domain/repositories/tasks-repository';
 import Tasks from '../db/schemas/tasks';
 import User from '../../domain/models/user';
@@ -33,63 +33,19 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<Task[]> {
-    const query:any = { 'technical._id': Types.ObjectId(userId) };
-    if (status === 'closed') {
-      query.closedDate = { $ne: null };
-    } else {
-      query.closedDate = null;
+  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<taskResponse> {
+    const count: number = await Tasks.countDocuments({ technical: userId, closedDate: { $ne: null } })
+    const pages = Math.ceil(count / limit);
+    if (count > 0 && page <= pages) {
+      const task = await Tasks.find({ technical: userId, closedDate: { $ne: null } })
+        .populate('technical', '-password')
+        .populate('coordinator', '-password')
+        .populate('place')
+        .skip(limit * page)
+        .limit(limit);
+      return { total: count, task, itemsPerPage: limit, pages };
     }
-    const task = await Tasks.aggregate([
-      // join users for technical
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'technical',
-          foreignField: '_id',
-          pipeline: [{ $project: { password: 0 } }],
-          as: 'technical'
-        }
-      },
-      {
-        $unwind: '$technical'
-      },
-      // filtramos solo los de la variable userId
-      {
-        $match: query
-      },
-      // join users for coordinator
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'coordinator',
-          foreignField: '_id',
-          pipeline: [{ $project: { password: 0 } }],
-          as: 'coordinator'
-        }
-      },
-      // join place
-      {
-        $lookup: {
-          from: 'places',
-          localField: 'place',
-          foreignField: '_id',
-          as: 'place'
-        }
-      },
-      {
-        $facet: {
-          paginatedResults: [{ $skip: (limit * page) }, { $limit: limit }],
-          totalCount: [
-            {
-              $count: 'count'
-            }
-          ]
-        }
-      }
-    ])
-
-    return task;
+    return { total: count, task: null, itemsPerPage: limit, pages };
   }
 
   async getAllByIdUserAndRangeDates(
@@ -111,8 +67,8 @@ export default class TasksRepositoryImpl implements TasksRepository {
       })
       .populate('place');
 
-    const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
-    return filteredTasks;
+    //const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
+    return tasks;
   }
 
   private async groupByUser(match?: {
