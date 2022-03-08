@@ -118,8 +118,8 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { status, userId } = req.params;
-      //const { userId } = res.locals.session;
+      const { status } = req.params;
+      const { userId } = res.locals.session;
       const { limit, page } = req.query;
       console.log('limit', limit);
       console.log('page', page);
