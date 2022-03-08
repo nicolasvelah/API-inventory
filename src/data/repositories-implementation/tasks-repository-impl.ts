@@ -34,10 +34,12 @@ export default class TasksRepositoryImpl implements TasksRepository {
   }
 
   async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<taskResponse> {
-    const count: number = await Tasks.countDocuments({ technical: userId, closedDate: { $ne: null } })
+    let closedDate = null;
+    if (status === 'closed') closedDate = { $ne: null };
+    const count: number = await Tasks.countDocuments({ technical: userId, closedDate })
     const pages = Math.ceil(count / limit);
     if (count > 0 && page <= pages) {
-      const task = await Tasks.find({ technical: userId, closedDate: { $ne: null } })
+      const task = await Tasks.find({ technical: userId, closedDate })
         .populate('technical', '-password')
         .populate('coordinator', '-password')
         .populate('place')
