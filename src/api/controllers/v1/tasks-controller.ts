@@ -118,16 +118,17 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { status } = req.params;
-      const { idUser } = res.locals.session;
+      const { status, idUser } = req.params;
+      //const { idUser } = res.locals.session;
       const { limit, page } = req.query;
       const tasks:any = await this.tasksRepo.getAllByIdUser(idUser, status, Number(page), Number(limit));
-      for (let i = 0; i < tasks.task.length; i++) {
-        const currTask = tasks.task[i]
-        // eslint-disable-next-line no-await-in-loop
-        const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
-        tasks.task[i].inventory = inventory;
-        console.log('--------------', tasks)
+      if (tasks.total > 0) {
+        for (let i = 0; i < tasks.task.length; i++) {
+          const currTask = tasks.task[i]
+          // eslint-disable-next-line no-await-in-loop
+          const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
+          tasks.task[i].inventory = inventory;
+        }
       }
       res.send(tasks);
     } catch (e) {

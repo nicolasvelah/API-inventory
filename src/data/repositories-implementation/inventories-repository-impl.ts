@@ -87,7 +87,8 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
   }
 
   async getTaskInventory(id: string): Promise<Inventory[]> {
-    const material = await Inventories.find({ task: id });
+    const material = await Inventories.find({ task: id })
+      .populate('device', '-dataToCollectInterface');
     return material;
   }
 }
