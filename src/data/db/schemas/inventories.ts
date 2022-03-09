@@ -13,6 +13,11 @@ const schema = new Schema(
       type: Schema.Types.ObjectId,
       required: true
     },
+    box: {
+      ref: 'boxes',
+      type: Schema.Types.ObjectId,
+      required: false
+    },
     place: {
       ref: 'place',
       type: Schema.Types.ObjectId,
@@ -35,8 +40,6 @@ const schema = new Schema(
     },
     installationDate: { type: Date, required: false },
     spentMaterial: { type: Number, required: false },
-    remainingMaterial: { type: Number, required: false },
-    totalMaterial: { type: Number, required: false },
     photos: { type: JSON, required: false },
     dataCollected: { type: JSON, required: false },
   },

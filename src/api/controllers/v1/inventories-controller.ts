@@ -5,10 +5,13 @@ import { Dependencies } from '../../../dependency-injection';
 import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 import InventoriesRepository from '../../../domain/repositories/inventories-repository';
+import BoxesRepository from '../../../domain/repositories/boxes-respository';
 import { deleteFile } from '../utils/file-upload'
 
 export default class InventoriesController {
   private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
+
+  private boxesRepo = Get.find<BoxesRepository>(Dependencies.boxes);
 
   constructor() {
     autoBind(this);
@@ -95,7 +98,7 @@ export default class InventoriesController {
       if (message !== 'OK') throw { code: 406, message };
 
       res.status(200).send({ message });
-    } catch (error) {
+    } catch (error:any) {
       console.log('Error en Excel load-file', error.message);
       deleteFile(req.file.path);
       res.status(406).send({ message: error.message });
@@ -105,27 +108,55 @@ export default class InventoriesController {
   async addDataToInventory(data:any): Promise<string> {
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
+      const boxTempIDs = []
       for (let o = 0; o < item.length; o++) {
         const columns = item[o];
-        console.log('columns', columns)
-        if (!columns.deviceId && !columns.dataCollected) {
-          return 'Incorrect Format, No deviceId and unicDataCollected columns'
+        if (!columns.totalMaterial) {
+          if (!columns.deviceId && !columns.dataCollected) {
+            return 'Incorrect Format, No deviceId and unicDataCollected columns'
+          }
+          let boxObj:any = null;
+          if (columns.boxId && columns.boxId.length < 2) {
+            boxObj = boxTempIDs.find((u) => u.docID === columns.boxId);
+            columns.boxId = boxObj?.dbId;
+          }
+          const material = {
+            device: columns.deviceId,
+            box: columns.boxId ?? null,
+            place: columns.placeId ?? null,
+            user: columns.userId ?? null,
+            task: columns.taskId ?? null,
+            state: columns.state ?? 'free',
+            installationDate: columns.installationDate ?? null,
+            spentMaterial: columns.spentMaterial ?? 0,
+            photos: columns.photos ?? null,
+            dataCollected: JSON.parse(columns.dataCollected)
+          }
+          if (columns.spentMaterial && columns.boxId) {
+            const remainingMaterial = Number(boxObj.total) - Number(columns.spentMaterial);
+            this.boxesRepo.update(columns.boxId, { remainingMaterial });
+            for (let z = 0; z < boxTempIDs.length; z++) {
+              const u = boxTempIDs[z];
+              if (u.docID === columns.boxId) {
+                boxTempIDs[z].total = String(remainingMaterial);
+              }
+            }
+          }
+          console.log('material', material)
+          this.inventoriesRepo.create(material);
+        } else {
+          if (!columns.totalMaterial && !columns.deviceId) {
+            return 'Incorrect Format, No deviceId and totalMaterial columns for box creation'
+          }
+          const boxData = {
+            device: columns.deviceId,
+            remainingMaterial: columns.totalMaterial ?? 0,
+            totalMaterial: columns.totalMaterial ?? 0,
+          }
+          // eslint-disable-next-line no-await-in-loop
+          const boxRespData = await this.boxesRepo.create(boxData);
+          if (columns.boxId) boxTempIDs.push({ dbId: boxRespData._id, docID: columns.boxId, total: columns.totalMaterial })
         }
-        const material = {
-          device: columns.deviceId,
-          place: columns.placeId ?? null,
-          user: columns.userId ?? null,
-          task: columns.taskId ?? null,
-          state: columns.state ?? 'free',
-          installationDate: columns.installationDate ?? null,
-          spentMaterial: columns.spentMaterial ?? 0,
-          remainingMaterial: columns.remainingMaterial ?? 0,
-          totalMaterial: columns.totalMaterial ?? 0,
-          photos: columns.photos ?? null,
-          dataCollected: JSON.parse(columns.dataCollected)
-        }
-        console.log('material', material)
-        this.inventoriesRepo.create(material);
       }
     }
     return 'OK';

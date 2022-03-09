@@ -6,6 +6,7 @@ import Place from './place';
 import User from './user';
 import Task from './task';
 import Catalog from './catalog';
+import Box from './boxes';
 
 enum InventoryState {
   installed,
@@ -23,6 +24,7 @@ export interface Photos {
 
 export default interface Inventory extends Document {
   device: Catalog | string;
+  box?: Box | string;
   place?: Place | string;
   user?: User | string;
   task?: Task | string;

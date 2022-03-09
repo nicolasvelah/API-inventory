@@ -118,8 +118,8 @@ export default class TasksController {
 
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
-      const { status } = req.params;
-      const { idUser } = res.locals.session;
+      const { status, idUser } = req.params;
+      //const { idUser } = res.locals.session;
       const { limit, page } = req.query;
       const tasks:any = await this.tasksRepo.getAllByIdUser(idUser, status, Number(page), Number(limit));
       if (tasks.total > 0) {

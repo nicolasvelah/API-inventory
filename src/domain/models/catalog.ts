@@ -28,7 +28,6 @@ export default interface Catalog extends Document {
   device: string; // equipo
   brand: string;
   referenceModel: string;
-  dataToCollectInterface: JSON;
   typePlace: placeCatalogType;
   unitOfMeasurement?: string;
   state?: stateCatalogType;

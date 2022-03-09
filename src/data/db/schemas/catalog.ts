@@ -26,10 +26,6 @@ const schema = new Schema(
       type: String,
       required: true
     },
-    dataToCollectInterface: {
-      type: JSON,
-      required: true
-    },
     typePlace: {
       type: String,
       enum: PLACE_CATALOG_TYPE_LIST,

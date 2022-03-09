@@ -14,7 +14,7 @@ export default () => {
 
   router.get('/', controller.getAll); // middleware.verifyToken
   router.get('/getGroupByUser', controller.getGroupByUser);
-  router.get('/user/:status', middleware.verifyToken, controller.getAllByIdUser);
+  router.get('/user/:idUser/:status', controller.getAllByIdUser);
   router.get(
     '/user/:userId/range/:startDate/:endDate',
     controller.getAllByIdUserAndRangeDates
