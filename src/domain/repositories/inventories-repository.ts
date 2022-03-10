@@ -1,6 +1,6 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
-import { DocumentDefinition } from 'mongoose';
+import { DocumentDefinition, LeanDocument } from 'mongoose';
 import Inventory from '../models/inventory';
 
 export default interface InventoriesRepository {
@@ -8,5 +8,5 @@ export default interface InventoriesRepository {
   deleteById(id: string): Promise<boolean>;
   getAll(): Promise<Inventory[]>;
   getTaskInventory(id: string): Promise<Inventory[]>;
-  getBy(id: string, type: string): Promise<Inventory[]>;
+  getByUser(id: string, state: string): Promise<LeanDocument<Inventory>[]>;
 }

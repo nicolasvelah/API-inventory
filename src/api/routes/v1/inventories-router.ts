@@ -11,7 +11,7 @@ export default () => {
   router.post('/', middleware.verifyToken, controller.create);
   router.delete('/:id', middleware.verifyToken, controller.delete);
   router.get('/', controller.getAll);
-  router.get('/getby/:type/:id', controller.getBy);
+  router.get('/getby/user', controller.getByUser);
 
   router.post(
     '/upload-file-material',

@@ -61,9 +61,11 @@ export default class InventoriesController {
     }
   }
 
-  async getBy(req: Request, res: Response): Promise<void> {
+  async getByUser(req: Request, res: Response): Promise<void> {
     try {
-      const inventories = await this.inventoriesRepo.getBy(req.params.id, req.params.type);
+      const { idUser } = res.locals.session;
+      const { state } = req.query;
+      const inventories = await this.inventoriesRepo.getByUser(idUser, String(state));
       res.send(inventories);
     } catch (e) {
       sendErrorResponse(e, res);
@@ -134,10 +136,11 @@ export default class InventoriesController {
           }
           if (columns.spentMaterial && columns.boxId) {
             const remainingMaterial = Number(boxObj.total) - Number(columns.spentMaterial);
-            this.boxesRepo.update(columns.boxId, { remainingMaterial });
+            // eslint-disable-next-line no-await-in-loop
+            await this.boxesRepo.update(columns.boxId, { remainingMaterial });
             for (let z = 0; z < boxTempIDs.length; z++) {
               const u = boxTempIDs[z];
-              if (u.docID === columns.boxId) {
+              if (u.dbId === columns.boxId) {
                 boxTempIDs[z].total = String(remainingMaterial);
               }
             }

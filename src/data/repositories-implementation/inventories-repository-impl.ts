@@ -1,4 +1,4 @@
-import { DocumentDefinition, Types } from 'mongoose';
+import { DocumentDefinition, LeanDocument } from 'mongoose';
 import Inventories from '../db/schemas/inventories';
 import InventoriesRepository from '../../domain/repositories/inventories-repository';
 import Inventory from '../../domain/models/inventory';
@@ -22,74 +22,41 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return material;
   }
 
-  async getBy(id: string, type: string): Promise<Inventory[]> {
-    let query:any = null;
-    const OId = Types.ObjectId(id);
-    const unwindString = `$${type}`;
-    switch (type) {
-      case 'task':
-        query = { 'task._id': OId }
-        break;
-      case 'device':
-        query = { 'device._id': OId }
-        break;
-      case 'place':
-        query = { 'place._id': OId }
-        break;
-      default:
-        query = { 'user._id': OId }
-        break;
+  async getByUser(id: string, state: string): Promise<LeanDocument<Inventory>[]> {
+    let place = null;
+    if (state !== 'free') {
+      place = { $ne: null }
     }
-    const material = await Inventories.aggregate([
-      // join users
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'user',
-          foreignField: '_id',
-          as: 'user'
-        }
-      },
-      // join tasks
-      {
-        $lookup: {
-          from: 'tasks',
-          localField: 'task',
-          foreignField: '_id',
-          as: 'task'
-        }
-      },
-      // join place
-      {
-        $lookup: {
-          from: 'places',
-          localField: 'place',
-          foreignField: '_id',
-          as: 'place'
-        }
-      },
-      // join devices
-      {
-        $lookup: {
-          from: 'devices',
-          localField: 'device',
-          foreignField: '_id',
-          as: 'device'
-        }
-      },
-      {
-        $unwind: unwindString
-      },
-      // filtramos solo los de la variable userId
-      { $match: query }
-    ])
-    return material;
+    const inventory = await Inventories.find({ user: id, place })
+      .populate({
+        path: 'device',
+        populate: {
+          path: 'categoryId',
+          select: ['-createdAt', '-updatedAt', '-__v']
+        },
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .populate({
+        path: 'box',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .populate({
+        path: 'place',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .populate({
+        path: 'task',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .select(['-user', '-state', '-__v', '-createdAt', '-updatedAt'])
+      .lean();
+    return inventory;
   }
 
   async getTaskInventory(id: string): Promise<Inventory[]> {
     const material = await Inventories.find({ task: id })
       .populate('device')
-      .populate('box');
+      .populate('box', '-device');
     return material;
   }
 }
