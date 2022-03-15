@@ -23,7 +23,8 @@ export default class PlacesController {
         mainStreet,
         municipality,
         state,
-        type
+        type,
+        IntalledMaterial
       } = req.body;
 
       const place = await this.placesRepo.create({
@@ -38,7 +39,8 @@ export default class PlacesController {
         mainStreet,
         municipality,
         state,
-        type
+        type,
+        IntalledMaterial: IntalledMaterial ?? null
       });
 
       res.send(place);

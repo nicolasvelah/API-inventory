@@ -18,7 +18,11 @@ const schema = new Schema(
       type: String,
       enum: PLACE_TYPE_LIST,
       default: defaultPlaceType
-    }
+    },
+    IntalledMaterial: [{
+      ref: 'inventory',
+      type: Schema.Types.ObjectId,
+    }]
   },
   { timestamps: true }
 );

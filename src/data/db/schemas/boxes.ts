@@ -4,11 +4,13 @@ import Boxes from '../../../domain/models/boxes';
 const schema = new Schema(
   {
     device: {
-      type: String,
+      ref: 'catalog',
+      type: Schema.Types.ObjectId,
       required: true
     },
     remainingMaterial: { type: Number, required: false },
-    totalMaterial: { type: Number, required: false }
+    totalMaterial: { type: Number, required: false },
+    dataCollected: { type: [JSON], required: false }
   },
   { timestamps: true }
 );

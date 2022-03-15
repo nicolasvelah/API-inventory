@@ -6,12 +6,16 @@ import Get from '../../../helpers/get';
 import sendErrorResponse from '../utils/send-error';
 import InventoriesRepository from '../../../domain/repositories/inventories-repository';
 import BoxesRepository from '../../../domain/repositories/boxes-respository';
+import FragmentRepository from '../../../domain/repositories/fragment-repository';
 import { deleteFile } from '../utils/file-upload'
+import { UpdateRequest } from '../../../domain/models/inventory';
 
 export default class InventoriesController {
   private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   private boxesRepo = Get.find<BoxesRepository>(Dependencies.boxes);
+
+  private fragmentRepo = Get.find<FragmentRepository>(Dependencies.fragments);
 
   constructor() {
     autoBind(this);
@@ -65,8 +69,11 @@ export default class InventoriesController {
     try {
       const { idUser } = res.locals.session;
       const { state } = req.query;
-      const inventories = await this.inventoriesRepo.getByUser(idUser, String(state));
-      res.send(inventories);
+      const inventory = await this.inventoriesRepo.getByUser(idUser, String(state));
+      const fragments = await this.fragmentRepo.getByUser(idUser);
+      const response: any = { inventory }
+      if (state === 'free') response.fragments = fragments
+      res.send(response);
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -93,8 +100,9 @@ export default class InventoriesController {
         data.push(dataCovert);
       }
       console.log('DATA -->', data);
-
-      const message:string = await this.addDataToInventory(data);
+      const { idUser } = res.locals.session;
+      //const idUser = '6214416bc341eaa648916b15';
+      const message:string = await this.addDataToInventory(data, idUser);
 
       deleteFile(req.file.path);
       if (message !== 'OK') throw { code: 406, message };
@@ -107,7 +115,7 @@ export default class InventoriesController {
     }
   }
 
-  async addDataToInventory(data:any): Promise<string> {
+  async addDataToInventory(data:any, idUser: string): Promise<string> {
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
       const boxTempIDs = []
@@ -120,11 +128,21 @@ export default class InventoriesController {
           let boxObj:any = null;
           if (columns.boxId && columns.boxId.length < 2) {
             boxObj = boxTempIDs.find((u) => u.docID === columns.boxId);
-            columns.boxId = boxObj?.dbId;
+            columns.fragmentId = boxObj?.fragmentId;
+          } else if (columns.boxId && columns.boxId.length > 2) {
+            const fragmentDataOne = {
+              owner: columns.userId ?? idUser,
+              box: columns.boxId,
+              remainingFragment: columns.spentMaterial ?? 0,
+              totalFragment: columns.spentMaterial ?? 0,
+            }
+            // eslint-disable-next-line no-await-in-loop
+            const fragRespDataOne = await this.fragmentRepo.create(fragmentDataOne);
+            columns.fragmentId = fragRespDataOne?._id;
           }
           const material = {
             device: columns.deviceId,
-            box: columns.boxId ?? null,
+            fragment: columns.fragmentId ?? null,
             place: columns.placeId ?? null,
             user: columns.userId ?? null,
             task: columns.taskId ?? null,
@@ -158,10 +176,49 @@ export default class InventoriesController {
           }
           // eslint-disable-next-line no-await-in-loop
           const boxRespData = await this.boxesRepo.create(boxData);
-          if (columns.boxId) boxTempIDs.push({ dbId: boxRespData._id, docID: columns.boxId, total: columns.totalMaterial })
+
+          const fragmentData = {
+            owner: columns.userId ?? idUser,
+            box: boxRespData._id,
+            remainingFragment: columns.spentMaterial ?? 0,
+            totalFragment: columns.spentMaterial ?? 0,
+          }
+          // eslint-disable-next-line no-await-in-loop
+          const fragRespData = await this.fragmentRepo.create(fragmentData);
+
+          if (columns.boxId) boxTempIDs.push({ fragmentId: fragRespData._id, dbId: boxRespData._id, docID: columns.boxId, total: columns.totalMaterial })
         }
       }
     }
     return 'OK';
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+      const { idUser } = res.locals.session;
+      //const idUser = '6214416bc341eaa648916b15'
+      const {
+        place,
+        task,
+        spentMaterial,
+        inRemplaceId
+      }: UpdateRequest = req.body;
+      const { id } = req.params;
+
+      const inventory = await this.inventoriesRepo.update(
+        id,
+        {
+          place,
+          task,
+          spentMaterial,
+          inRemplaceId
+        },
+        idUser
+      );
+      res.send({ inventory });
+    } catch (error) {
+      console.log(error, res)
+      sendErrorResponse(error, res);
+    }
   }
 }

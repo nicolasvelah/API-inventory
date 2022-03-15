@@ -8,6 +8,7 @@ export default interface Boxes extends Document {
   device?: Catalog | string;
   remainingMaterial?: number | null;
   totalMaterial?: number | null;
+  dataCollected?: [JSON] | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

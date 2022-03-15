@@ -35,7 +35,11 @@ const schema = new Schema(
       enum: TASK_TYPE_LIST,
       default: defaultType
     },
-    description: { type: String }
+    description: { type: String },
+    catalogToInstall: [{
+      ref: 'catalog',
+      type: Schema.Types.ObjectId,
+    }]
   },
   { timestamps: true }
 );

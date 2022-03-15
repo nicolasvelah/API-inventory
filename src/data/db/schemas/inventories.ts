@@ -13,8 +13,8 @@ const schema = new Schema(
       type: Schema.Types.ObjectId,
       required: true
     },
-    box: {
-      ref: 'boxes',
+    fragment: {
+      ref: 'fragments',
       type: Schema.Types.ObjectId,
       required: false
     },
@@ -41,7 +41,7 @@ const schema = new Schema(
     installationDate: { type: Date, required: false },
     spentMaterial: { type: Number, required: false },
     photos: { type: JSON, required: false },
-    dataCollected: { type: JSON, required: false },
+    dataCollected: { type: [JSON], required: false },
   },
   { timestamps: true }
 );

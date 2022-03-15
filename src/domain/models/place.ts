@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
 import Point from './point';
+import Inventory from './inventory';
 
 enum PlaceType {
   ATM,
@@ -21,6 +22,7 @@ export default interface Place extends Document {
   city: string;
   state: string;
   type: placeType;
+  IntalledMaterial?: Inventory[] | string[] | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

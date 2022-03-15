@@ -24,6 +24,7 @@ export default class TasksController {
         scheduledDate,
         type,
         description,
+        catalogToInstall
       } = req.body; // como se relaciona con el inventario
 
       const task = await this.tasksRepo.create({
@@ -32,7 +33,8 @@ export default class TasksController {
         place: idPlace,
         scheduledDate: new Date(scheduledDate),
         type,
-        description
+        description,
+        catalogToInstall
       });
       res.send(task);
     } catch (e) {
@@ -58,28 +60,29 @@ export default class TasksController {
       } = req.body;
 
       const data:any = {
-        technical: idTechnical,
-        coordinator: idCoordinator,
-        place: idPlace,
+        technical: idTechnical ?? null,
+        coordinator: idCoordinator ?? null,
+        place: idPlace ?? null,
         arrivalDate: arrivalDate ? new Date(arrivalDate) : null,
-        arrivalLatLong: {
+        arrivalLatLong: arrivalLatLong ? {
           type: 'Point',
           coordinates: arrivalLatLong
-        },
-        arrivalPhoto,
+        } : null,
+        arrivalPhoto: arrivalPhoto ?? null,
         closedDate: closedDate ? new Date(closedDate) : null,
-        closedLatLong: {
+        closedLatLong: closedLatLong ? {
           type: 'Point',
           coordinates: closedLatLong
-        },
+        } : null,
         closedPhoto: closedPhoto ?? null,
         scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
-        type,
-        description
+        type: type ?? null,
+        description: description ?? null
       }
 
       const task = await this.tasksRepo.update(req.params.id, data);
-      res.send(task);
+      if (!task) throw { code: 406, message: 'Task id dont found' };
+      res.send({ task });
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -122,14 +125,6 @@ export default class TasksController {
       const { idUser } = res.locals.session;
       const { limit, page } = req.query;
       const tasks:any = await this.tasksRepo.getAllByIdUser(idUser, status, Number(page), Number(limit));
-      if (tasks.total > 0) {
-        for (let i = 0; i < tasks.task.length; i++) {
-          const currTask = tasks.task[i]
-          // eslint-disable-next-line no-await-in-loop
-          const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
-          tasks.task[i].inventory = inventory;
-        }
-      }
       res.send(tasks);
     } catch (e) {
       sendErrorResponse(e, res);
