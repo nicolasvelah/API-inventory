@@ -40,9 +40,41 @@ export default class TasksRepositoryImpl implements TasksRepository {
     const pages = Math.ceil(count / limit);
     if (count > 0 && page <= pages) {
       const task = await Tasks.find({ technical: userId, closedDate })
-        .populate('technical', '-password')
-        .populate('coordinator', '-password')
-        .populate('place')
+        .populate('technical', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate('coordinator', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate({
+          path: 'place',
+          populate: {
+            path: 'IntalledMaterial',
+            select: ['-createdAt', '-updatedAt', '-__v', '-place', '-user', '-task'],
+            populate: [
+              {
+                path: 'device',
+                select: ['-createdAt', '-updatedAt', '-__v'],
+              },
+              {
+                path: 'fragment',
+                select: ['-createdAt', '-updatedAt', '-__v', '-owner', '-remainingFragment', '-totalFragment'],
+                populate: [
+                  {
+                    path: 'box',
+                    select: ['-createdAt', '-updatedAt', '-__v', '-remainingMaterial', '-totalMaterial', '-device'],
+                  }
+                ]
+              }
+            ]
+          },
+          select: ['-__v', '-createdAt', '-updatedAt']
+        })
+        .populate({
+          path: 'catalogToInstall',
+          populate: {
+            path: 'categoryId',
+            select: ['-createdAt', '-updatedAt', '-__v']
+          },
+          select: ['-__v', '-createdAt', '-updatedAt', '-state']
+        })
+        .select(['-__v', '-createdAt', '-updatedAt'])
         .skip(limit * page)
         .limit(limit)
         .lean();
