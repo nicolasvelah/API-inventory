@@ -1,26 +1,27 @@
 import { DocumentDefinition, LeanDocument } from 'mongoose';
 import Inventories from '../db/schemas/inventories';
 import Fragments from '../db/schemas/fragments';
+import Boxes from '../db/schemas/boxes';
 import Places from '../db/schemas/places';
 import InventoriesRepository from '../../domain/repositories/inventories-repository';
-import Inventory from '../../domain/models/inventory';
+import Inventory, { UpdateRequest } from '../../domain/models/inventory';
 
 export default class InventoriesRepositoryImpl implements InventoriesRepository {
   create(data: DocumentDefinition<Inventory>): Promise<Inventory> {
     return Inventories.create(data);
   }
 
-  async update(id: string, data: any, idUser: string): Promise<Inventory | null> {
+  async update(id: string, data: UpdateRequest, idUser: string): Promise<Inventory | Object | null> {
     if (data.inRemplaceId) {
       const invOld = await Inventories.findById(data.inRemplaceId);
-      if (!invOld) return null;
+      if (!invOld) throw { code: 406, message: `${id} is not a Inventory id or id dont exist to be remplace` };
       invOld.state = 'unInstalled'
       await invOld.save();
     }
 
-    if (!data.fragment) {
+    if (!data.spentMaterial) {
       const inv = await Inventories.findById(id);
-      if (!inv) return null;
+      if (!inv) throw { code: 406, message: `${id} is not a Inventory id or id dont exist` };
       inv.place = data.place ?? inv.place;
       inv.task = data.task ?? inv.task;
       inv.state = 'installed';
@@ -30,8 +31,16 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
       return inv;
     }
 
-    const fragment:any = await Fragments.findOne({ id: data.fragment.id })
+    const fragment:any = await Fragments.findOne({ _id: id })
       .populate('box');
+    if (!fragment) throw { code: 406, message: `${id} is not a Fragment id or id dont exist` };
+    if (fragment.remainingFragment < data.spentMaterial) throw { code: 406, message: `${data.spentMaterial} is to much, we have ${fragment.remainingFragment} in this fragment` };
+    fragment.remainingFragment -= data.spentMaterial;
+    const box:any = await Boxes.findOne({ _id: fragment.box._id })
+    if (box.remainingMaterial < data.spentMaterial) throw { code: 406, message: `${data.spentMaterial} is to much, we have ${box.remainingMaterial} in this Box` };
+    box.remainingMaterial -= data.spentMaterial;
+    await box.save();
+    await fragment.save();
     const newInventory = {
       state: 'installed',
       device: fragment.box.device,
@@ -39,34 +48,32 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
       user: idUser,
       task: data.task,
       installationDate: new Date(),
-      spentMaterial: data.fragment.spentMaterial,
-      fragment: data.fragment.id
+      spentMaterial: data.spentMaterial,
+      fragment: id
     }
 
     const fragmentInv = await Inventories.create(newInventory);
-
     await this.placeUpdate(data.place, fragmentInv._id, data.inRemplaceId);
 
-    return fragmentInv;
+    return { fragment: fragmentInv, remainingFragment: fragment.remainingFragment };
   }
 
   async placeUpdate(placeId: string, idToAdd:string, inRemplaceId?:string | null): Promise<boolean | null> {
     const place:any = await Places.findById({ _id: placeId })
+    const { IntalledMaterial } = place;
+
     if (!place) return null;
-    if (inRemplaceId && place.IntalledMaterial) {
-      for (let i = 0; i < place.IntalledMaterial.length; i++) {
-        const placeMaterial = place.IntalledMaterial[i]
+    if (inRemplaceId && IntalledMaterial) {
+      for (let i = 0; i < IntalledMaterial.length; i++) {
+        const placeMaterial = IntalledMaterial[i]
         if (String(placeMaterial) === inRemplaceId) {
           place.IntalledMaterial.splice(i, 1);
         }
       }
     }
-
-    const { IntalledMaterial } = place;
     if (!IntalledMaterial) place.IntalledMaterial = [];
     if (!IntalledMaterial.includes(idToAdd)) place.IntalledMaterial.push(idToAdd);
     await place.save();
-    //console.log({ place });
     return true
   }
 
