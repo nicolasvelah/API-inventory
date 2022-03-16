@@ -25,7 +25,7 @@ export default class TasksController {
         type,
         description,
         catalogToInstall
-      } = req.body; // como se relaciona con el inventario
+      } = req.body;
 
       const task = await this.tasksRepo.create({
         technical: idTechnical,

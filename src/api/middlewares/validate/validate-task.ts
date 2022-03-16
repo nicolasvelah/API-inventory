@@ -14,6 +14,29 @@ export default class ValidateTask {
     return validate(validationParams, { statusCode: 406 });
   }
 
+  static createValidation() {
+    const validationParams: schema = {
+      body: Joi.object({
+        idTechnical: Joi.string().required(),
+        idCoordinator: Joi.string().required(),
+        idPlace: Joi.string().required(),
+        scheduledDate: Joi.date().required(),
+        arrivalDate: Joi.date(),
+        arrivalLatLong: Joi.array(),
+        arrivalPhoto: Joi.string().allow(null),
+        closedDate: Joi.date().allow(null),
+        closedLatLong: Joi.array().allow(null),
+        closedPhoto: Joi.string().allow(null),
+        certificatePhoto: Joi.string().allow(null),
+        emnployeePhoto: Joi.string().allow(null),
+        type: Joi.valid(...['installation', 'service', 'maintenance']).required(),
+        description: Joi.string(),
+        catalogToInstall: Joi.array()
+      })
+    };
+    return validate(validationParams, { statusCode: 406 });
+  }
+
   static updateValidation() {
     const validationParams: schema = {
       params: Joi.object({
@@ -26,12 +49,12 @@ export default class ValidateTask {
         scheduledDate: Joi.date(),
         arrivalDate: Joi.date(),
         arrivalLatLong: Joi.array(),
-        arrivalPhoto: Joi.string().allow(null),
+        arrivalPhoto: Joi.string(),
         closedDate: Joi.date(),
         closedLatLong: Joi.array(),
-        closedPhoto: Joi.string().allow(null),
-        certificatePhoto: Joi.string().allow(null),
-        emnployeePhoto: Joi.string().allow(null),
+        closedPhoto: Joi.string(),
+        certificatePhoto: Joi.string(),
+        emnployeePhoto: Joi.string(),
         type: Joi.valid(...['installation', 'service', 'maintenance']),
         description: Joi.string()
       })

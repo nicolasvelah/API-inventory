@@ -8,12 +8,12 @@ export default () => {
   const middleware = Middleware.getInstance();
   const controller = new TasksController();
 
-  router.post('/create', controller.create); // put middleware.verifyToken
+  router.post('/create', ValidateTask.createValidation(), controller.create);
   router.post('/update/:id', middleware.verifyToken, ValidateTask.updateValidation(), controller.update);
 
   router.delete('/:id', middleware.verifyToken, controller.delete);
 
-  router.get('/', controller.getAll); // middleware.verifyToken
+  router.get('/', controller.getAll);
   router.get('/getGroupByUser', controller.getGroupByUser);
   router.get('/user/:status', middleware.verifyToken, ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
   router.get(
