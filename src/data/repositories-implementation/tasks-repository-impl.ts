@@ -51,6 +51,12 @@ export default class TasksRepositoryImpl implements TasksRepository {
               {
                 path: 'device',
                 select: ['-createdAt', '-updatedAt', '-__v'],
+                populate: [
+                  {
+                    path: 'categoryId',
+                    select: ['-createdAt', '-updatedAt', '-__v'],
+                  }
+                ]
               },
               {
                 path: 'fragment',

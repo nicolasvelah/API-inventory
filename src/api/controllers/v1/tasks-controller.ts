@@ -27,6 +27,7 @@ export default class TasksController {
         catalogToInstall
       } = req.body;
 
+      if ((type === 'installation') && !(Array.isArray(catalogToInstall) && catalogToInstall.length)) throw { code: 406, message: 'For instalations need catalogToInstall' };
       const task = await this.tasksRepo.create({
         technical: idTechnical,
         coordinator: idCoordinator,
