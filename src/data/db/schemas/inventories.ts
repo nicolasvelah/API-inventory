@@ -40,7 +40,7 @@ const schema = new Schema(
     },
     installationDate: { type: Date, required: false },
     spentMaterial: { type: Number, required: false },
-    photos: { type: JSON, required: false },
+    photos: { type: [String], required: false },
     dataCollected: { type: [JSON], required: false },
   },
   { timestamps: true }

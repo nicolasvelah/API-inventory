@@ -18,12 +18,6 @@ enum InventoryState {
 export type inventoryStateType = keyof typeof InventoryState;
 export const INVENTORY_STATE_TYPE_LIST = Object.keys(InventoryState);
 
-export interface Photos {
-  url: string;
-  fecha: Date;
-  description: string;
-}
-
 export default interface Inventory extends Document {
   device: Catalog | string;
   fragment?: Fragment | string;
@@ -33,7 +27,7 @@ export default interface Inventory extends Document {
   state: inventoryStateType | string;
   installationDate?: Date;
   spentMaterial?: number;
-  photos?: Photos;
+  photos?: string[];
   dataCollected?: [JSON];
   createdAt?: Date;
   updatedAt?: Date;
