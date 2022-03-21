@@ -7,7 +7,8 @@ export default class ValidateInventory {
         place: Joi.string().required(),
         task: Joi.string().required(),
         spentMaterial: Joi.number(),
-        inRemplaceId: Joi.string()
+        inRemplaceId: Joi.string(),
+        photos: Joi.array().allow(null)
       })
     };
     console.log(validate(validationParams));
