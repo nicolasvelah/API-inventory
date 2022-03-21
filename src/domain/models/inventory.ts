@@ -38,4 +38,5 @@ export interface UpdateRequest {
   task: string;
   spentMaterial?: number;
   inRemplaceId?: string;
+  photos?: string[];
 }

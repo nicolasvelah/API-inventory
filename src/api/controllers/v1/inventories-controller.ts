@@ -201,7 +201,8 @@ export default class InventoriesController {
         place,
         task,
         spentMaterial,
-        inRemplaceId
+        inRemplaceId,
+        photos
       }: UpdateRequest = req.body;
       const { id } = req.params;
 
@@ -211,7 +212,8 @@ export default class InventoriesController {
           place,
           task,
           spentMaterial,
-          inRemplaceId
+          inRemplaceId,
+          photos
         },
         idUser
       );
