@@ -14,7 +14,33 @@ export default class PlacesRepositoryImpl implements PlacesRepository {
   }
 
   async getAll(): Promise<Place[]> {
-    const places = await Places.find({});
+    const places = await Places.find({})
+      .populate({
+        path: 'IntalledMaterial',
+        select: ['-createdAt', '-updatedAt', '-__v', '-place', '-user', '-task'],
+        populate: [
+          {
+            path: 'device',
+            select: ['-createdAt', '-updatedAt', '-__v'],
+            populate: [
+              {
+                path: 'categoryId',
+                select: ['-createdAt', '-updatedAt', '-__v'],
+              }
+            ]
+          },
+          {
+            path: 'fragment',
+            select: ['-createdAt', '-updatedAt', '-__v', '-owner', '-remainingFragment', '-totalFragment'],
+            populate: [
+              {
+                path: 'box',
+                select: ['-createdAt', '-updatedAt', '-__v', '-remainingMaterial', '-totalMaterial', '-device'],
+              }
+            ]
+          }
+        ]
+      });
     return places;
   }
 }

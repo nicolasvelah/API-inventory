@@ -61,4 +61,17 @@ export default class ValidateTask {
     };
     return validate(validationParams, { statusCode: 406 });
   }
+
+  static getAllValidation() {
+    const validationParams: schema = {
+      query: Joi.object({
+        limit: Joi.number().integer().min(10).max(100)
+          .required(),
+        page: Joi.number().min(1).required(),
+        from: Joi.date().required(),
+        to: Joi.date().required(),
+      })
+    };
+    return validate(validationParams, { statusCode: 406 });
+  }
 }

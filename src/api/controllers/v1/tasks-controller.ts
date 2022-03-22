@@ -101,10 +101,8 @@ export default class TasksController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      /*const resp = await this.tasksRepo.getGroupByUser();
-      console.log('resp -->', resp[0]); */
-      const tasks = await this.tasksRepo.getAll();
-      console.log('tasks -->', tasks);
+      const { limit, page, from, to } = req.query;
+      const tasks = await this.tasksRepo.getAll(new Date(Number(from)), new Date(Number(to)), Number(page), Number(limit));
       res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);

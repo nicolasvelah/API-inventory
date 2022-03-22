@@ -18,9 +18,71 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return this.groupByUser();
   }
 
-  async getAll(): Promise<Task[]> {
-    const tasks = await Tasks.find({}).populate('technical', '-password').populate('coordinator', '-password').populate('place');
-    return tasks;
+  // hay que refactorizar con getAllByIdUser hay código repetido...
+  async getAll(from:Date, to:Date, page:number, limit:number): Promise<taskResponse> {
+    console.log({ from, to });
+    const Realpage = page - 1;
+    const count: number = await Tasks.countDocuments(
+      { scheduledDate: {
+        $gte: from,
+        $lt: to
+      } }
+    );
+    const pages = Math.ceil(count / limit);
+    if (count > 0 && Realpage <= pages) {
+      const task = await Tasks.find(
+        { scheduledDate: {
+          $gte: from,
+          $lt: to
+        } }
+      )
+        .populate('technical', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate('coordinator', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate({
+          path: 'place',
+          populate: {
+            path: 'IntalledMaterial',
+            select: ['-createdAt', '-updatedAt', '-__v', '-place', '-user', '-task'],
+            populate: [
+              {
+                path: 'device',
+                select: ['-createdAt', '-updatedAt', '-__v'],
+                populate: [
+                  {
+                    path: 'categoryId',
+                    select: ['-createdAt', '-updatedAt', '-__v'],
+                  }
+                ]
+              },
+              {
+                path: 'fragment',
+                select: ['-createdAt', '-updatedAt', '-__v', '-owner', '-remainingFragment', '-totalFragment'],
+                populate: [
+                  {
+                    path: 'box',
+                    select: ['-createdAt', '-updatedAt', '-__v', '-remainingMaterial', '-totalMaterial', '-device'],
+                  }
+                ]
+              }
+            ]
+          },
+          select: ['-__v', '-createdAt', '-updatedAt']
+        })
+        .populate({
+          path: 'catalogToInstall',
+          populate: {
+            path: 'categoryId',
+            select: ['-createdAt', '-updatedAt', '-__v']
+          },
+          select: ['-__v', '-createdAt', '-updatedAt', '-state']
+        })
+        .select(['-__v', '-createdAt', '-updatedAt'])
+        .skip(limit * Realpage)
+        .limit(limit)
+        .lean();
+      return { total: count, task, itemsPerPage: limit, pages };
+    }
+    return { total: count, task: null, itemsPerPage: limit, pages };
   }
 
   create(data: DocumentDefinition<Task>): Promise<Task> {

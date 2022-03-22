@@ -15,7 +15,7 @@ export default interface TasksRepository {
   getGroupByUserAndUserId(userId: string): Promise<User[]>;
   create(data: DocumentDefinition<Task>): Promise<Task>;
   deleteById(id: string): Promise<boolean>;
-  getAll(): Promise<Task[]>;
+  getAll(from:Date, to:Date, page:number, limit:number): Promise<taskResponse>;
   getAllByIdUser(userId: string, status: string, page:number, limit:number): Promise<taskResponse>;
   getAllByIdUserAndRangeDates(userId: string, startDate: string, endDate: string): Promise<Task[]>;
   update(id: string, data: UpdateTask): Promise<Task | null>;

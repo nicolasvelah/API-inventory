@@ -60,6 +60,7 @@ export default class PlacesController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      //verify user type
       const places = await this.placesRepo.getAll();
       res.send(places);
     } catch (e) {

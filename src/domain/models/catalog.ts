@@ -2,6 +2,7 @@
 /* eslint-disable semi */
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
+import Categories from './categories';
 
 enum PlaceCatalogType {
   ATM,
@@ -32,6 +33,7 @@ export default interface Catalog extends Document {
   unitOfMeasurement?: string;
   state?: stateCatalogType;
   type?: typeCatalogType;
+  categoryId: Categories | string;
   createdAt?: Date;
   updatedAt?: Date;
 }

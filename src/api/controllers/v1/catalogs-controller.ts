@@ -14,7 +14,7 @@ export default class CatalogsController {
 
   async create(req: Request, res: Response) {
     try {
-      const { brand, device, referenceModel, typePlace, unitOfMeasurement, type } = req.body;
+      const { brand, device, referenceModel, typePlace, unitOfMeasurement, type, categoryId } = req.body;
 
       const inventory = await this.catalogsRepo.create({
         brand,
@@ -22,7 +22,8 @@ export default class CatalogsController {
         referenceModel,
         typePlace,
         unitOfMeasurement,
-        type
+        type,
+        categoryId
       });
 
       res.send(inventory);

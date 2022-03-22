@@ -14,7 +14,11 @@ export default class CatalogsRepositoryImpl implements CatalogsRepository {
   }
 
   async getAll(): Promise<Catalog[]> {
-    const places = await Catalogs.find({});
+    const places = await Catalogs.find({})
+      .populate({
+        path: 'categoryId',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      });
     return places;
   }
 }
