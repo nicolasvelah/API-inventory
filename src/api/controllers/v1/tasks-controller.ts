@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
@@ -9,7 +10,7 @@ import sendErrorResponse from '../utils/send-error';
 export default class TasksController {
   private tasksRepo = Get.find<TasksRepository>(Dependencies.tasks);
 
-  private inventoryRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
+  private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   constructor() {
     autoBind(this);
@@ -58,7 +59,31 @@ export default class TasksController {
         closedPhoto,
         type,
         description,
+        inventory,
       } = req.body;
+
+      const inventoryUpdated = [];
+      if (inventory) {
+        //const { idUser } = res.locals.session;
+        const idUser = '6214416bc341eaa648916b15'
+        for (let i = 0; i < inventory.length; i++) {
+          const item = inventory[i]
+          const { id, place, spentMaterial, inRemplaceId, photos } = item;
+
+          const curInventory = await this.inventoriesRepo.update(
+            id,
+            {
+              place,
+              task: req.params.id,
+              spentMaterial,
+              inRemplaceId,
+              photos
+            },
+            idUser
+          );
+          inventoryUpdated.push(curInventory)
+        }
+      }
 
       const data:any = {
         technical: idTechnical ?? null,
@@ -83,7 +108,7 @@ export default class TasksController {
 
       const task = await this.tasksRepo.update(req.params.id, data);
       if (!task) throw { code: 406, message: 'Task id dont found' };
-      res.send({ task });
+      res.send({ task, inventory: inventoryUpdated });
     } catch (e) {
       sendErrorResponse(e, res);
     }

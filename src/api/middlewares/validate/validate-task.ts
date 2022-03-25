@@ -38,6 +38,14 @@ export default class ValidateTask {
   }
 
   static updateValidation() {
+    const inventoryModel = Joi.object().keys({
+      id: Joi.string().required(),
+      place: Joi.string().required(),
+      spentMaterial: Joi.number(),
+      inRemplaceId: Joi.string(),
+      photos: Joi.array(),
+    });
+
     const validationParams: schema = {
       params: Joi.object({
         id: Joi.string().required()
@@ -56,7 +64,8 @@ export default class ValidateTask {
         certificatePhoto: Joi.string(),
         emnployeePhoto: Joi.string(),
         type: Joi.valid(...['installation', 'service', 'maintenance']),
-        description: Joi.string()
+        description: Joi.string(),
+        inventory: Joi.array().items(inventoryModel),
       })
     };
     return validate(validationParams, { statusCode: 406 });

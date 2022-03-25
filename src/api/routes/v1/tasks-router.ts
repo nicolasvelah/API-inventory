@@ -13,7 +13,7 @@ export default () => {
   router.get('/', middleware.verifyToken, ValidateTask.getAllValidation(), controller.getAll);
 
   //APP
-  router.post('/update/:id', middleware.verifyToken, ValidateTask.updateValidation(), controller.update);
+  router.post('/update/:id', ValidateTask.updateValidation(), controller.update);
   router.get('/user/:status', middleware.verifyToken, ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
 
   // rutas a revisar no urgentes
