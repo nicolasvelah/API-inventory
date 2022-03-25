@@ -64,8 +64,8 @@ export default class TasksController {
 
       const inventoryUpdated = [];
       if (inventory) {
-        //const { idUser } = res.locals.session;
-        const idUser = '6214416bc341eaa648916b15'
+        const { idUser } = res.locals.session;
+        //const idUser = '6214416bc341eaa648916b15'
         for (let i = 0; i < inventory.length; i++) {
           const item = inventory[i]
           const { id, place, spentMaterial, inRemplaceId, photos } = item;
