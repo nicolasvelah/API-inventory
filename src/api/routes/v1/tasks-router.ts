@@ -17,12 +17,12 @@ export default () => {
   router.get('/user/:status', middleware.verifyToken, ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
 
   // rutas a revisar no urgentes
-  router.delete('/:id', middleware.verifyToken, controller.delete);
-  router.get('/getGroupByUser', controller.getGroupByUser);
-  router.get(
+  //router.delete('/:id', middleware.verifyToken, controller.delete);
+  //router.get('/getGroupByUser', controller.getGroupByUser);
+  /*router.get(
     '/user/:userId/range/:startDate/:endDate',
     controller.getAllByIdUserAndRangeDates
-  );
+  );*/
 
   return router;
 };

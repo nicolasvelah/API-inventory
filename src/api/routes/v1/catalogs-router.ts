@@ -9,8 +9,7 @@ export default () => {
   const controller = new CatalogsController();
 
   router.get('/', middleware.verifyToken, ValidateCatalogs.getAllValidation(), controller.getAll);
-
-  router.post('/', controller.create);
-  router.delete('/:id', middleware.verifyToken, controller.delete);
+  router.post('/', middleware.verifyToken, ValidateCatalogs.createValidation(), controller.create);
+  //router.delete('/:id', middleware.verifyToken, controller.delete);
   return router;
 };

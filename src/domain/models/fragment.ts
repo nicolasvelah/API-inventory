@@ -13,3 +13,9 @@ export default interface Fragments extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface FragmentsCreateRequest extends Document {
+  boxId: string;
+  userId: string;
+  quantity: number;
+}

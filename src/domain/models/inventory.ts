@@ -40,3 +40,8 @@ export interface UpdateRequest {
   inRemplaceId?: string;
   photos?: string[];
 }
+
+export interface UpdateUserRequest {
+  id: string;
+  userId: string;
+}

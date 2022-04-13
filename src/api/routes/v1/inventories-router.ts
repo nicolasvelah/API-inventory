@@ -9,12 +9,13 @@ export default () => {
   const middleware = Middleware.getInstance();
   const controller = new InventoriesController();
 
-  router.post('/', middleware.verifyToken, controller.create);
-  router.delete('/:id', middleware.verifyToken, controller.delete);
-  router.get('/', controller.getAll);
   router.get('/getby/user', middleware.verifyToken, ValidateInventory.getByUserValidation(), controller.getByUser);
   router.post('/update/:id', middleware.verifyToken, ValidateInventory.updateValidation(), controller.update);
+  router.get('/', middleware.verifyToken, controller.getAll);
+  router.post('/user/update', middleware.verifyToken, ValidateInventory.updateUserValidation(), controller.updateUser);
+  router.post('/', ValidateInventory.createValidation(), controller.create);
 
+  //router.delete('/:id', middleware.verifyToken, controller.delete);
   router.post(
     '/upload-file-material',
     uploadExcel.single('file'),

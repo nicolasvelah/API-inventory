@@ -135,7 +135,7 @@ export default class TasksRepositoryImpl implements TasksRepository {
           select: ['-__v', '-createdAt', '-updatedAt']
         })
         .populate({
-          path: 'catalogToInstall',
+          path: 'catalogToInstall.id',
           populate: {
             path: 'categoryId',
             select: ['-createdAt', '-updatedAt', '-__v']

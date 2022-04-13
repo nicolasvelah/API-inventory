@@ -33,7 +33,7 @@ const schema = new Schema(
     },
     unitOfMeasurement: {
       type: String,
-      required: true
+      required: false
     },
     state: {
       type: String,

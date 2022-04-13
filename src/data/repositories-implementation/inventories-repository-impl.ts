@@ -11,6 +11,14 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return Inventories.create(data);
   }
 
+  async updateUser(id: string, idUser: string): Promise<Inventory | Object | null> {
+    const inv = await Inventories.findById(id);
+    if (!inv) throw { code: 406, message: `${id} is not a Inventory id or id dont exist` };
+    inv.user = idUser;
+    await inv.save();
+    return inv;
+  }
+
   async update(id: string, data: UpdateRequest, idUser: string): Promise<Inventory | Object | null> {
     if (data.inRemplaceId) {
       const invOld = await Inventories.findById(data.inRemplaceId);
@@ -82,12 +90,36 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAll(): Promise<Inventory[]> {
+  async getAll(): Promise<LeanDocument<Inventory>[]> {
     const material = await Inventories.find({})
-      .populate('user', '-password')
-      .populate('place')
-      .populate('task')
-      .populate('device');
+      .populate({
+        path: 'device',
+        populate: {
+          path: 'categoryId',
+          select: ['-createdAt', '-updatedAt', '-__v']
+        },
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .populate({
+        path: 'fragment',
+        select: ['-createdAt', '-updatedAt', '-__v', '-owner'],
+        populate: [
+          {
+            path: 'box',
+            select: ['-createdAt', '-updatedAt', '-__v', '-device'],
+          }
+        ]
+      })
+      .populate({
+        path: 'place',
+        select: ['-createdAt', '-updatedAt', '-__v', '-IntalledMaterial']
+      })
+      .populate({
+        path: 'task',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .select(['-user', '-state', '-__v', '-createdAt', '-updatedAt'])
+      .lean();
     return material;
   }
 

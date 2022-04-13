@@ -14,7 +14,16 @@ export default class BoxesRepositoryImpl implements BoxesRepository {
   }
 
   async getAll(): Promise<Boxes[]> {
-    const boxes = await Box.find({});
+    const boxes = await Box.find({})
+      .populate({
+        path: 'device',
+        populate: {
+          path: 'categoryId',
+          select: ['-createdAt', '-updatedAt', '-__v']
+        },
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .select(['-__v', '-createdAt', '-updatedAt']);
     return boxes;
   }
 

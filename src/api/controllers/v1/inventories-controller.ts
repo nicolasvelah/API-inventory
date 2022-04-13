@@ -8,7 +8,7 @@ import InventoriesRepository from '../../../domain/repositories/inventories-repo
 import BoxesRepository from '../../../domain/repositories/boxes-respository';
 import FragmentRepository from '../../../domain/repositories/fragment-repository';
 import { deleteFile } from '../utils/file-upload'
-import { UpdateRequest } from '../../../domain/models/inventory';
+import { UpdateRequest, UpdateUserRequest } from '../../../domain/models/inventory';
 
 export default class InventoriesController {
   private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
@@ -24,21 +24,19 @@ export default class InventoriesController {
   async create(req: Request, res: Response) {
     try {
       const {
-        user,
-        task,
-        place,
+        catalogId,
+        userId,
+        photos,
         dataCollected,
-        device,
         state
       } = req.body;
 
       const inventory = await this.inventoriesRepo.create({
-        user,
-        task,
-        place,
+        user: userId,
         dataCollected,
-        device,
-        state
+        device: catalogId,
+        state,
+        photos
       });
 
       res.send(inventory);
@@ -100,8 +98,8 @@ export default class InventoriesController {
         data.push(dataCovert);
       }
       console.log('DATA -->', data);
-      const { idUser } = res.locals.session;
-      //const idUser = '6214416bc341eaa648916b15';
+      //const { idUser } = res.locals.session;
+      const idUser = '6214416bc341eaa648916b15';
       const message:string = await this.addDataToInventory(data, idUser);
 
       deleteFile(req.file.path);
@@ -218,6 +216,24 @@ export default class InventoriesController {
         idUser
       );
       res.send({ inventory });
+    } catch (error) {
+      console.log(error, res)
+      sendErrorResponse(error, res);
+    }
+  }
+
+  async updateUser(req: Request, res: Response) {
+    try {
+      const { data }: {data:Array<UpdateUserRequest>} = req.body;
+      const response = []
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        console.log({ item });
+        // eslint-disable-next-line no-await-in-loop
+        const inventory = await this.inventoriesRepo.updateUser(item.id, item.userId);
+        response.push(inventory);
+      }
+      res.send({ data: response });
     } catch (error) {
       console.log(error, res)
       sendErrorResponse(error, res);
