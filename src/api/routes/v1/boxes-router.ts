@@ -8,7 +8,7 @@ export default () => {
   const middleware = Middleware.getInstance();
   const controller = new BoxesController();
 
-  router.get('/', controller.get);
+  router.get('/', middleware.verifyToken, controller.get);
   router.post('/', middleware.verifyToken, ValidateBoxes.createValidation(), controller.create);
 
   return router;
