@@ -166,4 +166,19 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
       .populate('box', '-device');
     return material;
   }
+
+  async getByFragment(id:string): Promise<LeanDocument<Inventory>[]> {
+    const material = await Inventories.find({ fragment: id })
+      .populate({
+        path: 'place',
+        select: ['-createdAt', '-updatedAt', '-__v', '-IntalledMaterial']
+      })
+      .populate({
+        path: 'task',
+        select: ['-createdAt', '-updatedAt', '-__v']
+      })
+      .select(['-user', '-state', '-__v', '-createdAt', '-updatedAt', '-fragment', '-device'])
+      .lean();
+    return material;
+  }
 }

@@ -11,4 +11,5 @@ export default interface InventoriesRepository {
   getAll(): Promise<LeanDocument<Inventory>[]>;
   getTaskInventory(id: string): Promise<Inventory[]>;
   getByUser(id: string, state: string): Promise<LeanDocument<Inventory>[]>;
+  getByFragment(id:string): Promise<LeanDocument<Inventory>[]>;
 }

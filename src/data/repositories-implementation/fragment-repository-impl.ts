@@ -27,4 +27,11 @@ export default class FragmentRepositoryImpl implements FragmentRepository {
 
     return fragments;
   }
+
+  async getByBox(id: string): Promise<LeanDocument<Fragment>[]> {
+    const fragments = await Fragments.find({ box: id })
+      .select(['-owner', '-__v', '-createdAt', '-updatedAt', '-box'])
+      .lean();
+    return fragments;
+  }
 }

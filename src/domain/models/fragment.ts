@@ -7,7 +7,7 @@ import Box from './boxes';
 
 export default interface Fragments extends Document {
   owner: User | string;
-  box: Box | string;
+  box?: Box | string;
   remainingFragment: number | null;
   totalFragment: number | null;
   createdAt?: Date;
