@@ -19,11 +19,16 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return inv;
   }
 
-  async update(id: string, data: UpdateRequest, idUser: string): Promise<Inventory | Object | null> {
+  async update(
+    id: string,
+    data: UpdateRequest,
+    idUser: string
+  ): Promise<Inventory | Object | null> {
     if (data.inRemplaceId) {
       const invOld = await Inventories.findById(data.inRemplaceId);
-      if (!invOld) throw { code: 406, message: `${id} is not a Inventory id or id dont exist to be remplace` };
-      invOld.state = 'unInstalled'
+      if (!invOld)
+        throw { code: 406, message: `${id} is not a Inventory id or id dont exist to be remplace` };
+      invOld.state = 'unInstalled';
       await invOld.save();
     }
 
@@ -39,13 +44,20 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
       return inv;
     }
 
-    const fragment:any = await Fragments.findOne({ _id: id })
-      .populate('box');
+    const fragment: any = await Fragments.findOne({ _id: id }).populate('box');
     if (!fragment) throw { code: 406, message: `${id} is not a Fragment id or id dont exist` };
-    if (fragment.remainingFragment < data.spentMaterial) throw { code: 406, message: `${data.spentMaterial} is to much, we have ${fragment.remainingFragment} in this fragment` };
+    if (fragment.remainingFragment < data.spentMaterial)
+      throw {
+        code: 406,
+        message: `${data.spentMaterial} is to much, we have ${fragment.remainingFragment} in this fragment`
+      };
     fragment.remainingFragment -= data.spentMaterial;
-    const box:any = await Boxes.findOne({ _id: fragment.box._id })
-    if (box.remainingMaterial < data.spentMaterial) throw { code: 406, message: `${data.spentMaterial} is to much, we have ${box.remainingMaterial} in this Box` };
+    const box: any = await Boxes.findOne({ _id: fragment.box._id });
+    if (box.remainingMaterial < data.spentMaterial)
+      throw {
+        code: 406,
+        message: `${data.spentMaterial} is to much, we have ${box.remainingMaterial} in this Box`
+      };
     box.remainingMaterial -= data.spentMaterial;
     await box.save();
     await fragment.save();
@@ -58,7 +70,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
       installationDate: new Date(),
       spentMaterial: data.spentMaterial,
       fragment: id
-    }
+    };
 
     const fragmentInv = await Inventories.create(newInventory);
     await this.placeUpdate(data.place, fragmentInv._id, data.inRemplaceId);
@@ -66,14 +78,18 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return { fragment: fragmentInv, remainingFragment: fragment.remainingFragment };
   }
 
-  async placeUpdate(placeId: string, idToAdd:string, inRemplaceId?:string | null): Promise<boolean | null> {
-    const place:any = await Places.findById({ _id: placeId })
+  async placeUpdate(
+    placeId: string,
+    idToAdd: string,
+    inRemplaceId?: string | null
+  ): Promise<boolean | null> {
+    const place: any = await Places.findById({ _id: placeId });
     const { IntalledMaterial } = place;
 
     if (!place) return null;
     if (inRemplaceId && IntalledMaterial) {
       for (let i = 0; i < IntalledMaterial.length; i++) {
-        const placeMaterial = IntalledMaterial[i]
+        const placeMaterial = IntalledMaterial[i];
         if (String(placeMaterial) === inRemplaceId) {
           place.IntalledMaterial.splice(i, 1);
         }
@@ -82,7 +98,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     if (!IntalledMaterial) place.IntalledMaterial = [];
     if (!IntalledMaterial.includes(idToAdd)) place.IntalledMaterial.push(idToAdd);
     await place.save();
-    return true
+    return true;
   }
 
   async deleteById(id: string): Promise<boolean> {
@@ -106,7 +122,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
         populate: [
           {
             path: 'box',
-            select: ['-createdAt', '-updatedAt', '-__v', '-device'],
+            select: ['-createdAt', '-updatedAt', '-__v', '-device']
           }
         ]
       })
@@ -118,7 +134,11 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
         path: 'task',
         select: ['-createdAt', '-updatedAt', '-__v']
       })
-      .select(['-user', '-state', '-__v', '-createdAt', '-updatedAt'])
+      .populate({
+        path: 'user',
+        select: ['-password', '-updatedAt', '-__v']
+      })
+      .select(['-__v', '-createdAt', '-updatedAt'])
       .lean();
     return material;
   }
@@ -126,7 +146,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
   async getByUser(id: string, state: string): Promise<LeanDocument<Inventory>[]> {
     let place = null;
     if (state !== 'free') {
-      place = { $ne: null }
+      place = { $ne: null };
     }
     const inventory = await Inventories.find({ user: id, place })
       .populate({
@@ -143,7 +163,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
         populate: [
           {
             path: 'box',
-            select: ['-createdAt', '-updatedAt', '-__v', '-device'],
+            select: ['-createdAt', '-updatedAt', '-__v', '-device']
           }
         ]
       })
@@ -167,7 +187,7 @@ export default class InventoriesRepositoryImpl implements InventoriesRepository 
     return material;
   }
 
-  async getByFragment(id:string): Promise<LeanDocument<Inventory>[]> {
+  async getByFragment(id: string): Promise<LeanDocument<Inventory>[]> {
     const material = await Inventories.find({ fragment: id })
       .populate({
         path: 'place',
