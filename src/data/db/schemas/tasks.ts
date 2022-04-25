@@ -8,7 +8,7 @@ const CatalogToInstall = new Schema({
     ref: 'catalog',
     type: Schema.Types.ObjectId,
   },
-  quantity: { type: String },
+  quantity: { type: Number },
 });
 
 const schema = new Schema(
