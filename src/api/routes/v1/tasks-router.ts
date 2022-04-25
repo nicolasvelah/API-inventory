@@ -14,7 +14,7 @@ export default () => {
 
   //APP
   router.post('/update/:id', middleware.verifyToken, ValidateTask.updateValidation(), controller.update);
-  router.get('/user/:status', middleware.verifyToken, ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
+  router.get('/user/:status', ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
 
   // rutas a revisar no urgentes
   //router.delete('/:id', middleware.verifyToken, controller.delete);
