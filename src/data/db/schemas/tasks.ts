@@ -3,6 +3,13 @@ import Task, { TASK_TYPE_LIST, taskType } from '../../../domain/models/task';
 import pointSchema from './point';
 
 const defaultType: taskType = 'maintenance';
+const CatalogToInstall = new Schema({
+  id: {
+    ref: 'catalog',
+    type: Schema.Types.ObjectId,
+  },
+  quantity: { type: Number },
+});
 
 const schema = new Schema(
   {
@@ -35,7 +42,8 @@ const schema = new Schema(
       enum: TASK_TYPE_LIST,
       default: defaultType
     },
-    description: { type: String }
+    description: { type: String },
+    catalogToInstall: [CatalogToInstall]
   },
   { timestamps: true }
 );

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { Request, Response } from 'express';
 import autoBind from 'auto-bind';
 import { Dependencies } from '../../../dependency-injection';
@@ -9,7 +10,7 @@ import sendErrorResponse from '../utils/send-error';
 export default class TasksController {
   private tasksRepo = Get.find<TasksRepository>(Dependencies.tasks);
 
-  private inventoryRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
+  private inventoriesRepo = Get.find<InventoriesRepository>(Dependencies.inventories);
 
   constructor() {
     autoBind(this);
@@ -24,15 +25,18 @@ export default class TasksController {
         scheduledDate,
         type,
         description,
-      } = req.body; // como se relaciona con el inventario
+        catalogToInstall
+      } = req.body;
 
+      if ((type === 'installation') && !(Array.isArray(catalogToInstall) && catalogToInstall.length)) throw { code: 406, message: 'For instalations need catalogToInstall' };
       const task = await this.tasksRepo.create({
         technical: idTechnical,
         coordinator: idCoordinator,
         place: idPlace,
         scheduledDate: new Date(scheduledDate),
         type,
-        description
+        description,
+        catalogToInstall
       });
       res.send(task);
     } catch (e) {
@@ -55,31 +59,56 @@ export default class TasksController {
         closedPhoto,
         type,
         description,
+        inventory,
       } = req.body;
 
+      const inventoryUpdated = [];
+      if (inventory) {
+        const { idUser } = res.locals.session;
+        //const idUser = '6214416bc341eaa648916b15'
+        for (let i = 0; i < inventory.length; i++) {
+          const item = inventory[i]
+          const { id, place, spentMaterial, inRemplaceId, photos } = item;
+
+          const curInventory = await this.inventoriesRepo.update(
+            id,
+            {
+              place,
+              task: req.params.id,
+              spentMaterial,
+              inRemplaceId,
+              photos
+            },
+            idUser
+          );
+          inventoryUpdated.push(curInventory)
+        }
+      }
+
       const data:any = {
-        technical: idTechnical,
-        coordinator: idCoordinator,
-        place: idPlace,
+        technical: idTechnical ?? null,
+        coordinator: idCoordinator ?? null,
+        place: idPlace ?? null,
         arrivalDate: arrivalDate ? new Date(arrivalDate) : null,
-        arrivalLatLong: {
+        arrivalLatLong: arrivalLatLong ? {
           type: 'Point',
           coordinates: arrivalLatLong
-        },
-        arrivalPhoto,
+        } : null,
+        arrivalPhoto: arrivalPhoto ?? null,
         closedDate: closedDate ? new Date(closedDate) : null,
-        closedLatLong: {
+        closedLatLong: closedLatLong ? {
           type: 'Point',
           coordinates: closedLatLong
-        },
+        } : null,
         closedPhoto: closedPhoto ?? null,
         scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
-        type,
-        description
+        type: type ?? null,
+        description: description ?? null
       }
 
       const task = await this.tasksRepo.update(req.params.id, data);
-      res.send(task);
+      if (!task) throw { code: 406, message: 'Task id dont found' };
+      res.send({ task, inventory: inventoryUpdated });
     } catch (e) {
       sendErrorResponse(e, res);
     }
@@ -97,10 +126,8 @@ export default class TasksController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      /*const resp = await this.tasksRepo.getGroupByUser();
-      console.log('resp -->', resp[0]); */
-      const tasks = await this.tasksRepo.getAll();
-      console.log('tasks -->', tasks);
+      const { limit, page, from, to } = req.query;
+      const tasks = await this.tasksRepo.getAll(new Date(Number(from)), new Date(Number(to)), Number(page), Number(limit));
       res.send({ tasks });
     } catch (e) {
       sendErrorResponse(e, res);
@@ -119,18 +146,11 @@ export default class TasksController {
   async getAllByIdUser(req: Request, res: Response): Promise<void> {
     try {
       const { status } = req.params;
-      const { userId } = res.locals.session;
+      //const { idUser } = res.locals.session;
       const { limit, page } = req.query;
-      console.log('limit', limit);
-      console.log('page', page);
-      const tasks = await this.tasksRepo.getAllByIdUser(userId, status, Number(page), Number(limit));
-      for (let i = 0; i < tasks.length; i++) {
-        const currTask = tasks[i]
-        // eslint-disable-next-line no-await-in-loop
-        const inventory:any = await this.inventoryRepo.getTaskInventory(currTask._id);
-        tasks[i].inventory = inventory;
-      }
-      res.send({ tasks });
+      const idUser = '6214416bc341eaa648916b15'
+      const tasks:any = await this.tasksRepo.getAllByIdUser(idUser, status, Number(page), Number(limit));
+      res.send(tasks);
     } catch (e) {
       sendErrorResponse(e, res);
     }

@@ -26,10 +26,6 @@ const schema = new Schema(
       type: String,
       required: true
     },
-    dataToCollectInterface: {
-      type: JSON,
-      required: true
-    },
     typePlace: {
       type: String,
       enum: PLACE_CATALOG_TYPE_LIST,
@@ -37,7 +33,7 @@ const schema = new Schema(
     },
     unitOfMeasurement: {
       type: String,
-      required: true
+      required: false
     },
     state: {
       type: String,

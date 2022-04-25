@@ -23,7 +23,8 @@ export default class PlacesController {
         mainStreet,
         municipality,
         state,
-        type
+        type,
+        IntalledMaterial
       } = req.body;
 
       const place = await this.placesRepo.create({
@@ -38,7 +39,8 @@ export default class PlacesController {
         mainStreet,
         municipality,
         state,
-        type
+        type,
+        IntalledMaterial: IntalledMaterial ?? null
       });
 
       res.send(place);
@@ -58,6 +60,7 @@ export default class PlacesController {
 
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      //verify user type
       const places = await this.placesRepo.getAll();
       res.send(places);
     } catch (e) {

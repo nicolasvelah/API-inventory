@@ -13,6 +13,12 @@ import InventoriesRepository from './domain/repositories/inventories-repository'
 import InventoriesRepositoryImpl from './data/repositories-implementation/inventories-repository-impl';
 import CatalogsRepository from './domain/repositories/catalogs-repository';
 import CatalogsRepositoryImpl from './data/repositories-implementation/catalogs-repository-impl';
+import CategoriesRepository from './domain/repositories/categories-repository';
+import CategoriesRepositoryImpl from './data/repositories-implementation/categoires-repository-impl';
+import BoxesRepository from './domain/repositories/boxes-respository';
+import BoxesRepositoryImpl from './data/repositories-implementation/boxes-repository-impl'
+import FragmentRepository from './domain/repositories/fragment-repository';
+import FragmentRepositoryImpl from './data/repositories-implementation/fragment-repository-impl'
 import FirebaseRepository from './domain/repositories/firebase-repository';
 import FirebaseRepositoryImpl from './data/repositories-implementation/firebase-repository-impl';
 import WebsocketsRepository from './domain/repositories/websockets-repository';
@@ -25,6 +31,9 @@ export enum Dependencies {
   tasks = 'tasks',
   inventories = 'inventories',
   catalogs = 'catalogs',
+  categories = 'categories',
+  boxes = 'boxes',
+  fragments = 'fragments',
   firebase = 'firebase',
   websockets = 'websockets'
 }
@@ -37,6 +46,9 @@ const injectDependencies = (nameWs: string, server: Server) => {
   Get.put<TasksRepository>(new TasksRepositoryImpl(), Dependencies.tasks);
   Get.put<InventoriesRepository>(new InventoriesRepositoryImpl(), Dependencies.inventories);
   Get.put<CatalogsRepository>(new CatalogsRepositoryImpl(), Dependencies.catalogs);
+  Get.put<CategoriesRepository>(new CategoriesRepositoryImpl(), Dependencies.categories);
+  Get.put<BoxesRepository>(new BoxesRepositoryImpl(), Dependencies.boxes);
+  Get.put<FragmentRepository>(new FragmentRepositoryImpl(), Dependencies.fragments);
   Get.put<FirebaseRepository>(firebaseRepo, Dependencies.firebase);
   Get.put<WebsocketsRepository>(new WebsocketsRepositoryImpl(websockets), Dependencies.websockets);
 };

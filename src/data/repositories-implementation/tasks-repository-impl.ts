@@ -1,5 +1,5 @@
 import { DocumentDefinition, Types } from 'mongoose';
-import Task from '../../domain/models/task';
+import Task, { taskResponse } from '../../domain/models/task';
 import TasksRepository from '../../domain/repositories/tasks-repository';
 import Tasks from '../db/schemas/tasks';
 import User from '../../domain/models/user';
@@ -18,9 +18,71 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return this.groupByUser();
   }
 
-  async getAll(): Promise<Task[]> {
-    const tasks = await Tasks.find({}).populate('technical', '-password').populate('coordinator', '-password').populate('place');
-    return tasks;
+  // hay que refactorizar con getAllByIdUser hay código repetido...
+  async getAll(from:Date, to:Date, page:number, limit:number): Promise<taskResponse> {
+    console.log({ from, to });
+    const Realpage = page - 1;
+    const count: number = await Tasks.countDocuments(
+      { scheduledDate: {
+        $gte: from,
+        $lt: to
+      } }
+    );
+    const pages = Math.ceil(count / limit);
+    if (count > 0 && Realpage <= pages) {
+      const task = await Tasks.find(
+        { scheduledDate: {
+          $gte: from,
+          $lt: to
+        } }
+      )
+        .populate('technical', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate('coordinator', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate({
+          path: 'place',
+          populate: {
+            path: 'IntalledMaterial',
+            select: ['-createdAt', '-updatedAt', '-__v', '-place', '-user', '-task'],
+            populate: [
+              {
+                path: 'device',
+                select: ['-createdAt', '-updatedAt', '-__v'],
+                populate: [
+                  {
+                    path: 'categoryId',
+                    select: ['-createdAt', '-updatedAt', '-__v'],
+                  }
+                ]
+              },
+              {
+                path: 'fragment',
+                select: ['-createdAt', '-updatedAt', '-__v', '-owner', '-remainingFragment', '-totalFragment'],
+                populate: [
+                  {
+                    path: 'box',
+                    select: ['-createdAt', '-updatedAt', '-__v', '-remainingMaterial', '-totalMaterial', '-device'],
+                  }
+                ]
+              }
+            ]
+          },
+          select: ['-__v', '-createdAt', '-updatedAt']
+        })
+        .populate({
+          path: 'catalogToInstall',
+          populate: {
+            path: 'categoryId',
+            select: ['-createdAt', '-updatedAt', '-__v']
+          },
+          select: ['-__v', '-createdAt', '-updatedAt', '-state']
+        })
+        .select(['-__v', '-createdAt', '-updatedAt'])
+        .skip(limit * Realpage)
+        .limit(limit)
+        .lean();
+      return { total: count, task, itemsPerPage: limit, pages };
+    }
+    return { total: count, task: null, itemsPerPage: limit, pages };
   }
 
   create(data: DocumentDefinition<Task>): Promise<Task> {
@@ -33,63 +95,60 @@ export default class TasksRepositoryImpl implements TasksRepository {
     return (result.deletedCount ?? 0) > 0;
   }
 
-  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<Task[]> {
-    const query:any = { 'technical._id': Types.ObjectId(userId) };
-    if (status === 'closed') {
-      query.closedDate = { $ne: null };
-    } else {
-      query.closedDate = null;
+  async getAllByIdUser(userId: string, status:string, page:number, limit:number): Promise<taskResponse> {
+    let closedDate = null;
+    if (status === 'closed') closedDate = { $ne: null };
+    const count: number = await Tasks.countDocuments({ technical: userId, closedDate })
+    const pages = Math.ceil(count / limit);
+    if (count > 0 && page <= pages) {
+      const task = await Tasks.find({ technical: userId, closedDate })
+        .populate('technical', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate('coordinator', ['-password', '-createdAt', '-updatedAt', '-__v'])
+        .populate({
+          path: 'place',
+          populate: {
+            path: 'IntalledMaterial',
+            select: ['-createdAt', '-updatedAt', '-__v', '-place', '-user', '-task'],
+            populate: [
+              {
+                path: 'device',
+                select: ['-createdAt', '-updatedAt', '-__v'],
+                populate: [
+                  {
+                    path: 'categoryId',
+                    select: ['-createdAt', '-updatedAt', '-__v'],
+                  }
+                ]
+              },
+              {
+                path: 'fragment',
+                select: ['-createdAt', '-updatedAt', '-__v', '-owner', '-remainingFragment', '-totalFragment'],
+                populate: [
+                  {
+                    path: 'box',
+                    select: ['-createdAt', '-updatedAt', '-__v', '-remainingMaterial', '-totalMaterial', '-device'],
+                  }
+                ]
+              }
+            ]
+          },
+          select: ['-__v', '-createdAt', '-updatedAt']
+        })
+        .populate({
+          path: 'catalogToInstall.id',
+          populate: {
+            path: 'categoryId',
+            select: ['-createdAt', '-updatedAt', '-__v']
+          },
+          select: ['-__v', '-createdAt', '-updatedAt', '-state']
+        })
+        .select(['-__v', '-createdAt', '-updatedAt'])
+        .skip(limit * page)
+        .limit(limit)
+        .lean();
+      return { total: count, task, itemsPerPage: limit, pages };
     }
-    const task = await Tasks.aggregate([
-      // join users for technical
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'technical',
-          foreignField: '_id',
-          pipeline: [{ $project: { password: 0 } }],
-          as: 'technical'
-        }
-      },
-      {
-        $unwind: '$technical'
-      },
-      // filtramos solo los de la variable userId
-      {
-        $match: query
-      },
-      // join users for coordinator
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'coordinator',
-          foreignField: '_id',
-          pipeline: [{ $project: { password: 0 } }],
-          as: 'coordinator'
-        }
-      },
-      // join place
-      {
-        $lookup: {
-          from: 'places',
-          localField: 'place',
-          foreignField: '_id',
-          as: 'place'
-        }
-      },
-      {
-        $facet: {
-          paginatedResults: [{ $skip: (limit * page) }, { $limit: limit }],
-          totalCount: [
-            {
-              $count: 'count'
-            }
-          ]
-        }
-      }
-    ])
-
-    return task;
+    return { total: count, task: null, itemsPerPage: limit, pages };
   }
 
   async getAllByIdUserAndRangeDates(
@@ -111,8 +170,8 @@ export default class TasksRepositoryImpl implements TasksRepository {
       })
       .populate('place');
 
-    const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
-    return filteredTasks;
+    //const filteredTasks = tasks.filter((task) => !!task.technical.coordinator);
+    return tasks;
   }
 
   private async groupByUser(match?: {

@@ -15,21 +15,28 @@ export type taskType = keyof typeof TaskType;
 export const TASK_TYPE_LIST = Object.keys(TaskType);
 
 export default interface Task extends Document {
-  technical: User;
-  coordinator: User;
-  place: Place;
+  technical: User | string;
+  coordinator: User | string;
+  place: Place | string;
   scheduledDate: Date;
   arrivalDate?: Date;
   arrivalLatLong?: Point;
   arrivalPhoto?: string;
-  closedDate?: Date;
+  closedDate?: Date | null;
   closedLatLong?: Point;
   closedPhoto?: string;
   certificatePhoto?: string;
   emnployeePhoto?: string;
   type: taskType;
   description: string;
-  inventory?: any;
+  catalogToInstall: string[];
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface taskResponse {
+  total: number;
+  task: any | null;
+  itemsPerPage: number;
+  pages: number;
 }

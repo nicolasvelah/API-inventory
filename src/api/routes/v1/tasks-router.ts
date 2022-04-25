@@ -1,24 +1,28 @@
 import { Router } from 'express';
 import TasksController from '../../controllers/v1/tasks-controller';
 import Middleware from '../../middlewares/authentication-middleware';
+import ValidateTask from '../../middlewares/validate/validate-task';
 
 export default () => {
   const router = Router();
   const middleware = Middleware.getInstance();
   const controller = new TasksController();
 
-  router.post('/create', controller.create); // put middleware.verifyToken
-  router.post('/update/:id', controller.update);
+  //WEB
+  router.post('/create', middleware.verifyToken, ValidateTask.createValidation(), controller.create);
+  router.get('/', middleware.verifyToken, ValidateTask.getAllValidation(), controller.getAll);
 
-  router.delete('/:id', middleware.verifyToken, controller.delete);
+  //APP
+  router.post('/update/:id', middleware.verifyToken, ValidateTask.updateValidation(), controller.update);
+  router.get('/user/:status', middleware.verifyToken, ValidateTask.byUserGetValidation(), controller.getAllByIdUser);
 
-  router.get('/', controller.getAll); // middleware.verifyToken
-  router.get('/getGroupByUser', controller.getGroupByUser);
-  router.get('/user/:status', middleware.verifyToken, controller.getAllByIdUser);
-  router.get(
+  // rutas a revisar no urgentes
+  //router.delete('/:id', middleware.verifyToken, controller.delete);
+  //router.get('/getGroupByUser', controller.getGroupByUser);
+  /*router.get(
     '/user/:userId/range/:startDate/:endDate',
     controller.getAllByIdUserAndRangeDates
-  );
+  );*/
 
   return router;
 };
